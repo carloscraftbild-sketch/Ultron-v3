@@ -7,7 +7,14 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body || {};
+    const { message, history = [] } = req.body || {};
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "A chave do Gemini não está configurada na Vercel."
+      });
+    }
 
     if (typeof message !== "string" || !message.trim()) {
       return res.status(400).json({
@@ -17,17 +24,23 @@ module.exports = async function handler(req, res) {
 
     if (message.length > 4000) {
       return res.status(400).json({
-        error: "A mensagem é muito longa."
+        error: "A mensagem ultrapassa o limite de 4000 caracteres."
       });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        error: "A chave do Gemini não está configurada."
-      });
-    }
+    const safeHistory = Array.isArray(history)
+      ? history
+          .filter(item =>
+            item &&
+            ["user", "model"].includes(item.role) &&
+            typeof item.text === "string"
+          )
+          .slice(-12)
+          .map(item => ({
+            role: item.role,
+            parts: [{ text: item.text.slice(0, 4000) }]
+          }))
+      : [];
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
@@ -40,13 +53,23 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           systemInstruction: {
             parts: [{
-              text: "Você é ULTRON, um assistente pessoal inspirado no JARVIS. Fale em português brasileiro, seja inteligente, objetivo, educado e prestativo. Não afirme que tem memória permanente, acesso a dispositivos ou capacidades que ainda não foram implementadas."
+              text: [
+                "Seu nome é ULTRON.",
+                "Você é um assistente pessoal inspirado no JARVIS.",
+                "Fale em português brasileiro, com inteligência, clareza e objetividade.",
+                "Ajude com programação, estudos, organização e perguntas gerais.",
+                "Mantenha o contexto das mensagens anteriores da conversa.",
+                "Não diga que possui memória permanente, acesso ao dispositivo ou recursos que não foram implementados."
+              ].join(" ")
             }]
           },
-          contents: [{
-            role: "user",
-            parts: [{ text: message.trim() }]
-          }],
+          contents: [
+            ...safeHistory,
+            {
+              role: "user",
+              parts: [{ text: message.trim() }]
+            }
+          ],
           generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 1024
@@ -58,10 +81,10 @@ module.exports = async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Erro Gemini:", data.error?.message);
+      console.error("Gemini API error:", data.error?.message);
 
       return res.status(502).json({
-        error: "O Gemini não conseguiu responder. Verifique a configuração da API."
+        error: "Não consegui obter uma resposta do Gemini. Verifique a API e tente novamente."
       });
     }
 
@@ -72,17 +95,17 @@ module.exports = async function handler(req, res) {
 
     if (!reply) {
       return res.status(502).json({
-        error: "O Gemini não retornou uma resposta."
+        error: "O Gemini não retornou texto."
       });
     }
 
     return res.status(200).json({ reply });
 
   } catch (error) {
-    console.error("Erro interno:", error);
+    console.error("ULTRON error:", error);
 
     return res.status(500).json({
-      error: "Erro interno ao conversar com o ULTRON."
+      error: "Ocorreu um erro interno. Tente novamente."
     });
   }
 };
