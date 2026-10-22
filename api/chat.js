@@ -1,9 +1,7 @@
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Método não permitido."
-    });
+    return res.status(405).json({ error: "Método não permitido." });
   }
 
   try {
@@ -17,15 +15,11 @@ module.exports = async function handler(req, res) {
     }
 
     if (typeof message !== "string" || !message.trim()) {
-      return res.status(400).json({
-        error: "Digite uma mensagem."
-      });
+      return res.status(400).json({ error: "Digite uma mensagem." });
     }
 
     if (message.length > 4000) {
-      return res.status(400).json({
-        error: "A mensagem ultrapassa o limite de 4000 caracteres."
-      });
+      return res.status(400).json({ error: "Mensagem muito longa." });
     }
 
     const safeHistory = Array.isArray(history)
@@ -35,15 +29,15 @@ module.exports = async function handler(req, res) {
             ["user", "model"].includes(item.role) &&
             typeof item.text === "string"
           )
-          .slice(-12)
+          .slice(-10)
           .map(item => ({
             role: item.role,
-            parts: [{ text: item.text.slice(0, 4000) }]
+            parts: [{ text: item.text.slice(0, 3000) }]
           }))
       : [];
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
       {
         method: "POST",
         headers: {
@@ -53,14 +47,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           systemInstruction: {
             parts: [{
-              text: [
-                "Seu nome é ULTRON.",
-                "Você é um assistente pessoal inspirado no JARVIS.",
-                "Fale em português brasileiro, com inteligência, clareza e objetividade.",
-                "Ajude com programação, estudos, organização e perguntas gerais.",
-                "Mantenha o contexto das mensagens anteriores da conversa.",
-                "Não diga que possui memória permanente, acesso ao dispositivo ou recursos que não foram implementados."
-              ].join(" ")
+              text: "Você é ULTRON, um assistente pessoal inspirado no JARVIS. Responda em português brasileiro, com clareza, inteligência e objetividade. Seja direto por padrão, mas explique melhor quando necessário. Ajude com programação, estudos e organização. Não afirme possuir recursos que ainda não foram implementados."
             }]
           },
           contents: [
@@ -71,7 +58,7 @@ module.exports = async function handler(req, res) {
             }
           ],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.6,
             maxOutputTokens: 512
           }
         })
@@ -81,10 +68,9 @@ module.exports = async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Gemini API error:", data.error?.message);
-
+      console.error("Gemini API:", data.error?.message);
       return res.status(502).json({
-        error: "Não consegui obter uma resposta do Gemini. Verifique a API e tente novamente."
+        error: "O Gemini não conseguiu responder. Verifique a API e tente novamente."
       });
     }
 
@@ -95,18 +81,15 @@ module.exports = async function handler(req, res) {
 
     if (!reply) {
       return res.status(502).json({
-        error: "O Gemini não retornou texto."
+        error: "O Gemini não retornou uma resposta."
       });
     }
 
     return res.status(200).json({ reply });
-
   } catch (error) {
-    console.error("ULTRON error:", error);
-
+    console.error("Erro ULTRON:", error);
     return res.status(500).json({
-      error: "Ocorreu um erro interno. Tente novamente."
+      error: "Erro interno ao conversar com o ULTRON."
     });
   }
 };
-
