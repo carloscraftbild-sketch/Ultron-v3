@@ -92,6 +92,13 @@
       min-height: 20px; margin-top: 12px; color: var(--muted);
       font-size: 13px; white-space: pre-wrap;
     }
+    #memoryBar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; margin: 12px 0; padding: 12px;
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--muted); font-size: 12px;
+    }
+    #memoryBar button { padding: 8px 10px; font-size: 12px; }
     footer { padding: 20px; color: #666; font-size: 11px; text-align: center; }
     @media (max-width: 480px) {
       header { padding: 13px 10px; }
@@ -120,18 +127,20 @@
     <section id="loginScreen" class="panel login-card">
       <div class="orb">U</div>
       <h1>ACESSO <span class="accent">ULTRON</span></h1>
-      <p class="muted">
-        Autentique-se com sua conta Google para acessar seu assistente pessoal.
-      </p>
-      <button id="loginButton" class="google-button" type="button">
-        Entrar com Google
-      </button>
+      <p class="muted">Autentique-se com sua conta Google para acessar seu assistente pessoal.</p>
+      <button id="loginButton" class="google-button" type="button">Entrar com Google</button>
       <div id="loginNotice" role="status" class="muted"></div>
     </section>
 
     <section id="chatScreen" class="panel hidden">
       <h1>Olá. Eu sou o <span class="accent">ULTRON</span>.</h1>
       <p class="muted">Sistema online. Como posso ajudar?</p>
+
+      <div id="memoryBar">
+        <span id="memoryCount">Memória: carregando...</span>
+        <button id="viewMemoryButton" type="button">Ver memória</button>
+      </div>
+
       <div id="messages" aria-live="polite"></div>
       <form id="chatForm">
         <input id="messageInput" type="text" maxlength="4000"
@@ -157,7 +166,6 @@
       getFirestore, doc, getDoc, setDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-    // Configuração do aplicativo Firebase.
     const firebaseConfig = {
       apiKey: "AIzaSyCzmyFYp1DfBL71oNvrSzssSxYqPxcP_14",
       authDomain: "ultron-6a27a.firebaseapp.com",
@@ -168,7 +176,6 @@
     };
 
     const $ = id => document.getElementById(id);
-
     const loginScreen = $("loginScreen");
     const chatScreen = $("chatScreen");
     const loginButton = $("loginButton");
@@ -180,18 +187,27 @@
     const messageInput = $("messageInput");
     const sendButton = $("sendButton");
     const notice = $("notice");
+    const memoryCount = $("memoryCount");
 
     let auth;
     let db;
     let currentUser = null;
     let history = [];
     let savedMessages = [];
+    let memories = [];
     let sending = false;
     let authGeneration = 0;
 
-    // Cada conta possui seu próprio documento de conversas.
     function conversationRef(user) {
       return doc(db, "users", user.uid, "conversations", "main");
+    }
+
+    function memoryRef(user) {
+      return doc(db, "users", user.uid, "memories", "main");
+    }
+
+    function updateMemoryCount() {
+      memoryCount.textContent = `Memória: ${memories.length} informação(ões) salva(s)`;
     }
 
     function showLogin(message = "") {
@@ -238,11 +254,8 @@
     function renderMessages(messages) {
       messagesBox.replaceChildren();
       for (const item of messages) {
-        if (
-          item &&
-          (item.role === "user" || item.role === "model") &&
-          typeof item.text === "string"
-        ) {
+        if (item && (item.role === "user" || item.role === "model") &&
+            typeof item.text === "string") {
           addMessage(item.role, item.text);
         }
       }
@@ -250,45 +263,52 @@
 
     async function loadConversation(user) {
       const generation = authGeneration;
-      status.textContent = "CARREGANDO MEMÓRIA...";
-      notice.textContent = "Buscando conversas salvas na nuvem...";
+      status.textContent = "CARREGANDO SISTEMA...";
+      notice.textContent = "Carregando conversas e memória...";
       messagesBox.replaceChildren();
       history = [];
       savedMessages = [];
+      memories = [];
 
       try {
-        const snapshot = await getDoc(conversationRef(user));
+        const [conversationSnapshot, memorySnapshot] = await Promise.all([
+          getDoc(conversationRef(user)),
+          getDoc(memoryRef(user))
+        ]);
 
         if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
 
-        if (snapshot.exists()) {
-          const data = snapshot.data();
+        if (conversationSnapshot.exists()) {
+          const data = conversationSnapshot.data();
           const messages = Array.isArray(data.messages) ? data.messages : [];
 
           savedMessages = messages
-            .filter(item =>
-              item &&
+            .filter(item => item &&
               (item.role === "user" || item.role === "model") &&
-              typeof item.text === "string"
-            )
+              typeof item.text === "string")
             .slice(-40);
 
           renderMessages(savedMessages);
-          history = savedMessages.slice(-12).map(item => ({
-            role: item.role,
-            text: item.text
-          }));
-          notice.textContent = "Memória carregada.";
-        } else {
-          notice.textContent = "Memória pronta. Esta é sua primeira conversa salva.";
+          history = savedMessages.slice(-12);
         }
 
+        if (memorySnapshot.exists()) {
+          const data = memorySnapshot.data();
+          memories = Array.isArray(data.items)
+            ? data.items
+                .filter(item => typeof item === "string")
+                .slice(0, 30)
+            : [];
+        }
+
+        updateMemoryCount();
+        notice.textContent = "Conversas e memória carregadas.";
         status.textContent = "SISTEMA ONLINE";
       } catch (error) {
-        console.error("Erro ao carregar memória:", error);
+        console.error("Erro ao carregar dados:", error);
         notice.textContent =
-          "Não foi possível carregar a memória. Confira as regras do Firestore e sua conexão.";
-        status.textContent = "MEMÓRIA INDISPONÍVEL";
+          "Erro ao carregar dados. Confira as regras do Firestore e sua conexão.";
+        status.textContent = "ERRO AO CARREGAR";
       }
 
       if (generation === authGeneration && currentUser?.uid === user.uid) {
@@ -297,29 +317,97 @@
     }
 
     async function saveConversation(user) {
-      // Mantém no máximo 40 mensagens para limitar o tamanho do documento.
       savedMessages = savedMessages.slice(-40);
-
       await setDoc(conversationRef(user), {
         messages: savedMessages,
         updatedAt: serverTimestamp()
       }, { merge: true });
     }
 
+    async function saveMemories(user) {
+      memories = memories.slice(0, 30);
+      await setDoc(memoryRef(user), {
+        items: memories,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      updateMemoryCount();
+    }
+
+    function normalize(text) {
+      return text.trim().toLocaleLowerCase("pt-BR");
+    }
+
+    async function handleMemoryCommand(message, user) {
+      const text = message.trim();
+
+      const rememberMatch = text.match(/^(?:ultron[, ]*)?(?:lembre que|lembre-se de que|guarde que|salve na memória que)\s+(.+)$/i);
+
+      if (rememberMatch) {
+        const fact = rememberMatch[1].trim().replace(/[.!]+$/, "");
+        if (!fact) return null;
+
+        const exists = memories.some(item => normalize(item) === normalize(fact));
+        if (exists) {
+          return "Essa informação já está salva na minha memória.";
+        }
+
+        memories.unshift(fact);
+        memories = memories.slice(0, 30);
+
+        try {
+          await saveMemories(user);
+          return `Informação salva na memória: "${fact}". Vou considerá-la nas próximas conversas.`;
+        } catch (error) {
+          console.error("Erro ao salvar memória:", error);
+          memories = memories.filter(item => normalize(item) !== normalize(fact));
+          throw new Error("Não consegui salvar essa informação. Confira as regras do Firestore.");
+        }
+      }
+
+      if (/^(?:o que você lembra|o que voce lembra|ver memória|ver memoria|mostre sua memória|mostre sua memoria)\??$/i.test(text)) {
+        return memories.length
+          ? "Estas são as informações salvas na minha memória:\n\n" +
+            memories.map((item, index) => `${index + 1}. ${item}`).join("\n")
+          : "Ainda não tenho informações salvas. Você pode dizer: “Lembre que meu projeto se chama ULTRON”.";
+      }
+
+      const forgetMatch = text.match(/^(?:ultron[, ]*)?(?:esqueça que|esqueca que|apague da memória que|apague da memoria que)\s+(.+)$/i);
+
+      if (forgetMatch) {
+        const target = normalize(forgetMatch[1].replace(/[.!]+$/, ""));
+        const oldMemories = [...memories];
+        memories = memories.filter(item => {
+          const normalized = normalize(item);
+          return normalized !== target && !normalized.includes(target);
+        });
+
+        if (memories.length === oldMemories.length) {
+          return "Não encontrei essa informação na memória.";
+        }
+
+        try {
+          await saveMemories(user);
+          return "Informação removida da memória.";
+        } catch (error) {
+          memories = oldMemories;
+          throw new Error("Não consegui atualizar a memória no Firestore.");
+        }
+      }
+
+      return null;
+    }
+
     async function startLogin() {
       loginNotice.textContent = "";
       loginButton.disabled = true;
-
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
 
       try {
         await signInWithPopup(auth, provider);
       } catch (error) {
-        if (
-          error.code === "auth/popup-blocked" ||
-          error.code === "auth/operation-not-supported-in-this-environment"
-        ) {
+        if (error.code === "auth/popup-blocked" ||
+            error.code === "auth/operation-not-supported-in-this-environment") {
           try {
             await signInWithRedirect(auth, provider);
             return;
@@ -350,9 +438,18 @@
       }
     });
 
+    $("viewMemoryButton").addEventListener("click", () => {
+      addMessage(
+        "model",
+        memories.length
+          ? "Informações na memória:\n\n" +
+            memories.map((item, index) => `${index + 1}. ${item}`).join("\n")
+          : "Ainda não há informações salvas. Experimente: “Lembre que meu projeto se chama ULTRON”."
+      );
+    });
+
     chatForm.addEventListener("submit", async event => {
       event.preventDefault();
-
       const message = messageInput.value.trim();
       if (!message || sending || !currentUser) return;
 
@@ -367,10 +464,36 @@
       messageInput.value = "";
 
       try {
+        const memoryReply = await handleMemoryCommand(message, user);
+
+        if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
+
+        if (memoryReply !== null) {
+          addMessage("model", memoryReply);
+
+          const pair = [
+            { role: "user", text: message },
+            { role: "model", text: memoryReply }
+          ];
+
+          history.push(...pair);
+          history = history.slice(-12);
+          savedMessages.push(...pair);
+          savedMessages = savedMessages.slice(-40);
+
+          await saveConversation(user);
+          notice.textContent = "Memória atualizada e conversa salva na nuvem.";
+          return;
+        }
+
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message, history })
+          body: JSON.stringify({
+            message,
+            history,
+            memories
+          })
         });
 
         const data = await response.json();
@@ -394,22 +517,14 @@
 
         history.push(...pair);
         history = history.slice(-12);
-
         savedMessages.push(...pair);
         savedMessages = savedMessages.slice(-40);
 
         notice.textContent = "Salvando conversa na nuvem...";
+        await saveConversation(user);
 
-        try {
-          await saveConversation(user);
-
-          if (generation === authGeneration && currentUser?.uid === user.uid) {
-            notice.textContent = "Conversa salva na nuvem.";
-          }
-        } catch (saveError) {
-          console.error("Erro ao salvar no Firestore:", saveError);
-          notice.textContent =
-            "Resposta recebida, mas não foi possível salvar na nuvem. Confira as regras do Firestore.";
+        if (generation === authGeneration && currentUser?.uid === user.uid) {
+          notice.textContent = "Conversa salva na nuvem.";
         }
       } catch (error) {
         console.error("Erro no chat:", error);
@@ -420,7 +535,6 @@
         sending = false;
         sendButton.disabled = false;
         messageInput.disabled = false;
-
         if (currentUser) messageInput.focus();
       }
     });
@@ -443,7 +557,9 @@
           if (!user) {
             history = [];
             savedMessages = [];
+            memories = [];
             messagesBox.replaceChildren();
+            memoryCount.textContent = "Memória indisponível";
             notice.textContent = "";
             showLogin();
             return;
@@ -451,8 +567,6 @@
 
           showChat(user);
           await loadConversation(user);
-
-          // Impede que uma operação antiga altere a tela após trocar de conta.
           if (generation !== authGeneration) return;
         });
       } catch (error) {
