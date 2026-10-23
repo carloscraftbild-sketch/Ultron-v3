@@ -1,11 +1,13 @@
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método não permitido." });
+    return res.status(405).json({
+      error: "Método não permitido."
+    });
   }
 
   try {
-    const { message, history = [] } = req.body || {};
+    const { message, history = [], memories = [] } = req.body || {};
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -15,11 +17,15 @@ module.exports = async function handler(req, res) {
     }
 
     if (typeof message !== "string" || !message.trim()) {
-      return res.status(400).json({ error: "Digite uma mensagem." });
+      return res.status(400).json({
+        error: "Digite uma mensagem."
+      });
     }
 
     if (message.length > 4000) {
-      return res.status(400).json({ error: "Mensagem muito longa." });
+      return res.status(400).json({
+        error: "Mensagem muito longa."
+      });
     }
 
     const safeHistory = Array.isArray(history)
@@ -36,6 +42,28 @@ module.exports = async function handler(req, res) {
           }))
       : [];
 
+    const safeMemories = Array.isArray(memories)
+      ? memories
+          .filter(item => typeof item === "string")
+          .slice(0, 30)
+          .map(item => item.slice(0, 500))
+      : [];
+
+    const memoryContext = safeMemories.length
+      ? "\n\nINFORMAÇÕES IMPORTANTES SALVAS PELO USUÁRIO:\n" +
+        safeMemories.map(item => "- " + item).join("\n") +
+        "\nUse essas informações quando forem relevantes. " +
+        "Não invente lembranças que não estejam nesta lista."
+      : "\n\nAinda não há informações importantes salvas na memória.";
+
+    const systemPrompt =
+      "Você é ULTRON, um assistente pessoal inspirado no JARVIS. " +
+      "Responda em português brasileiro, com clareza, inteligência e objetividade. " +
+      "Seja direto por padrão, mas explique melhor quando necessário. " +
+      "Ajude com programação, estudos e organização. " +
+      "Não afirme possuir recursos que ainda não foram implementados." +
+      memoryContext;
+
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
       {
@@ -46,9 +74,7 @@ module.exports = async function handler(req, res) {
         },
         body: JSON.stringify({
           systemInstruction: {
-            parts: [{
-              text: "Você é ULTRON, um assistente pessoal inspirado no JARVIS. Responda em português brasileiro, com clareza, inteligência e objetividade. Seja direto por padrão, mas explique melhor quando necessário. Ajude com programação, estudos e organização. Não afirme possuir recursos que ainda não foram implementados."
-            }]
+            parts: [{ text: systemPrompt }]
           },
           contents: [
             ...safeHistory,
