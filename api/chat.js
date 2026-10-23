@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
 
     if (!apiKey) {
       return res.status(500).json({
-        error: "A chave do Gemini não está configurada na Vercel."
+        error: "GEMINI_API_KEY não está configurada nas variáveis de ambiente da Vercel."
       });
     }
 
@@ -24,23 +24,57 @@ module.exports = async function handler(req, res) {
 
     if (message.length > 4000) {
       return res.status(400).json({
-        error: "Mensagem muito longa."
+        error: "A mensagem ultrapassou o limite de 4.000 caracteres."
       });
     }
 
+    // Aceita os dois formatos de histórico:
+    // { role: "user", text: "..." }
+    // { role: "user", parts: [{ text: "..." }] }
     const safeHistory = Array.isArray(history)
       ? history
           .filter(item =>
             item &&
-            ["user", "model"].includes(item.role) &&
-            typeof item.text === "string"
+            ["user", "model"].includes(item.role)
           )
+          .map(item => {
+            let text = "";
+
+            if (typeof item.text === "string") {
+              text = item.text;
+            } else if (Array.isArray(item.parts)) {
+              text = item.parts
+                .filter(part => part && typeof part.text === "string")
+                .map(part => part.text)
+                .join("\n");
+            }
+
+            return {
+              role: item.role,
+              parts: [{ text: text.slice(0, 3000) }]
+            };
+          })
+          .filter(item => item.parts[0].text.trim())
           .slice(-10)
-          .map(item => ({
-            role: item.role,
-            parts: [{ text: item.text.slice(0, 3000) }]
-          }))
       : [];
+
+    // O histórico precisa começar com uma mensagem do usuário.
+    while (safeHistory.length && safeHistory[0].role !== "user") {
+      safeHistory.shift();
+    }
+
+    // Evita duas mensagens seguidas com o mesmo papel.
+    const normalizedHistory = [];
+
+    for (const item of safeHistory) {
+      const previous = normalizedHistory[normalizedHistory.length - 1];
+
+      if (previous && previous.role === item.role) {
+        previous.parts[0].text += "\n" + item.parts[0].text;
+      } else {
+        normalizedHistory.push(item);
+      }
+    }
 
     const safeMemories = Array.isArray(memories)
       ? memories
@@ -50,22 +84,23 @@ module.exports = async function handler(req, res) {
       : [];
 
     const memoryContext = safeMemories.length
-      ? "\n\nINFORMAÇÕES IMPORTANTES SALVAS PELO USUÁRIO:\n" +
+      ? "\n\nINFORMAÇÕES SALVAS PELO USUÁRIO:\n" +
         safeMemories.map(item => "- " + item).join("\n") +
         "\nUse essas informações quando forem relevantes. " +
         "Não invente lembranças que não estejam nesta lista."
-      : "\n\nAinda não há informações importantes salvas na memória.";
+      : "\n\nAinda não há informações salvas na memória.";
 
     const systemPrompt =
       "Você é ULTRON, um assistente pessoal inspirado no JARVIS. " +
       "Responda em português brasileiro, com clareza, inteligência e objetividade. " +
-      "Seja direto por padrão, mas explique melhor quando necessário. " +
+      "Seja direto por padrão e explique melhor quando necessário. " +
       "Ajude com programação, estudos e organização. " +
+      "Ao gerar código, entregue exemplos completos e indique os arquivos necessários. " +
       "Não afirme possuir recursos que ainda não foram implementados." +
       memoryContext;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
       {
         method: "POST",
         headers: {
@@ -77,7 +112,7 @@ module.exports = async function handler(req, res) {
             parts: [{ text: systemPrompt }]
           },
           contents: [
-            ...safeHistory,
+            ...normalizedHistory,
             {
               role: "user",
               parts: [{ text: message.trim() }]
@@ -85,18 +120,47 @@ module.exports = async function handler(req, res) {
           ],
           generationConfig: {
             temperature: 0.6,
-            maxOutputTokens: 512
+            maxOutputTokens: 2048
           }
         })
       }
     );
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      console.error("Gemini API:", data.error?.message);
+      // Registra detalhes no servidor, sem expor a chave secreta.
+      console.error("Erro da API Gemini:", {
+        status: response.status,
+        message: data.error?.message || "Erro sem descrição"
+      });
+
+      if (response.status === 400) {
+        return res.status(502).json({
+          error: "O Gemini rejeitou a solicitação. Verifique o histórico e o formato enviado."
+        });
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        return res.status(502).json({
+          error: "A API do Gemini recusou o acesso. Confira a chave e as permissões no Google AI Studio."
+        });
+      }
+
+      if (response.status === 404) {
+        return res.status(502).json({
+          error: "O modelo Gemini configurado não foi encontrado ou não está disponível para sua chave."
+        });
+      }
+
+      if (response.status === 429) {
+        return res.status(502).json({
+          error: "O limite de solicitações do Gemini foi atingido. Aguarde e tente novamente."
+        });
+      }
+
       return res.status(502).json({
-        error: "O Gemini não conseguiu responder. Verifique a API e tente novamente."
+        error: "O Gemini não conseguiu responder. Código de resposta: " + response.status
       });
     }
 
@@ -106,16 +170,23 @@ module.exports = async function handler(req, res) {
       .trim();
 
     if (!reply) {
+      console.error("Resposta Gemini sem texto:", JSON.stringify({
+        finishReason: data.candidates?.[0]?.finishReason,
+        blockReason: data.promptFeedback?.blockReason
+      }));
+
       return res.status(502).json({
-        error: "O Gemini não retornou uma resposta."
+        error: "O Gemini não retornou texto. Tente reformular a mensagem."
       });
     }
 
     return res.status(200).json({ reply });
+
   } catch (error) {
-    console.error("Erro ULTRON:", error);
+    console.error("Erro interno ULTRON:", error?.message || error);
+
     return res.status(500).json({
-      error: "Erro interno ao conversar com o ULTRON."
+      error: "Erro interno ao conversar com o ULTRON. Tente novamente."
     });
   }
 };
