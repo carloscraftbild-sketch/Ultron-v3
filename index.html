@@ -410,24 +410,47 @@ async function sendMessage(override){
   }finally{busy=false;$('sendBtn').disabled=false;$('sendBtn').textContent='Enviar'}
 }
 
+
 async function login(){
   showLoginError('');
-  const button=$('loginBtn');button.disabled=true;button.textContent='Conectando…';
-  try{
-    if(!auth)throw new Error('O Firebase ainda está iniciando. Tente novamente.');
-    const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({prompt:'select_account'});
-    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
-      button.textContent='Redirecionando para o Google…';
-      await signInWithRedirect(auth,provider);return;
+  const button = $('loginBtn');
+  button.disabled = true;
+  button.textContent = 'Conectando…';
+
+  try {
+    if (!auth) {
+      throw new Error('O Firebase ainda está iniciando. Tente novamente.');
     }
-    await signInWithPopup(auth,provider);
-  }catch(e){
-    console.error(e);
-    showLoginError(e.code==='auth/unauthorized-domain'?'Este domínio não está autorizado no Firebase.':e.message||'Erro ao entrar.');
-    button.disabled=false;button.textContent='Entrar com Google';
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    await signInWithPopup(auth, provider);
+
+  } catch (e) {
+    console.error('Erro no login Google:', e);
+
+    let message = 'Não foi possível entrar com o Google.';
+
+    if (e.code === 'auth/unauthorized-domain') {
+      message = 'Este domínio não está autorizado no Firebase.';
+    } else if (e.code === 'auth/popup-blocked') {
+      message = 'O navegador bloqueou a janela de login. Tente permitir pop-ups.';
+    } else if (e.code === 'auth/popup-closed-by-user') {
+      message = 'A janela de login foi fechada antes de concluir.';
+    } else if (e.code === 'auth/network-request-failed') {
+      message = 'Falha de conexão. Verifique a internet.';
+    } else if (e.message) {
+      message = e.message;
+    }
+
+    showLoginError(message);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Entrar com Google';
   }
 }
+
 
 function readLocalProjects(){
   try{const value=JSON.parse(localStorage.getItem(projectStorageKey)||'[]');return Array.isArray(value)?value:[]}
