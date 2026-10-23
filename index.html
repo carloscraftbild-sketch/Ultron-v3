@@ -1,582 +1,132 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#090909">
-  <title>ULTRON | Assistente Pessoal</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --red: #ff3030;
-      --bg: #090909;
-      --panel: #141414;
-      --border: #292929;
-      --text: #f2f2f2;
-      --muted: #999;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; background: var(--bg);
-      color: var(--text); font-family: Arial, sans-serif;
-    }
-    button, input { font: inherit; }
-    button {
-      cursor: pointer; border: 1px solid var(--red);
-      border-radius: 10px; padding: 12px 16px;
-      background: var(--red); color: white; font-weight: bold;
-    }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    .hidden { display: none !important; }
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; padding: 16px; border-bottom: 1px solid var(--border);
-      background: #0d0d0d;
-    }
-    .brand {
-      color: var(--red); font-size: 24px; font-weight: 900;
-      letter-spacing: 4px;
-    }
-    .status { margin-top: 5px; color: var(--muted); font-size: 12px; }
-    main { width: min(850px, 100%); margin: auto; padding: 20px 14px; }
-    .panel {
-      padding: 22px; border: 1px solid var(--border);
-      border-radius: 16px; background: var(--panel);
-    }
-    h1 { margin-top: 0; }
-    .accent { color: var(--red); }
-    .muted { color: var(--muted); line-height: 1.6; }
-    .login-card { max-width: 440px; margin: 45px auto; text-align: center; }
-    .orb {
-      width: 92px; height: 92px; margin: 8px auto 24px;
-      border: 2px solid var(--red); border-radius: 50%;
-      box-shadow: 0 0 30px #ff303044, inset 0 0 22px #ff303033;
-      display: grid; place-items: center; color: var(--red);
-      font-size: 30px; font-weight: 900;
-    }
-    .google-button {
-      width: 100%; margin-top: 16px;
-      background: #f2f2f2; color: #171717; border-color: #f2f2f2;
-    }
-    #userBar { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-    #userPhoto { width: 34px; height: 34px; border-radius: 50%; }
-    #logoutButton { padding: 8px 10px; background: transparent; font-size: 12px; }
-    #messages {
-      display: flex; flex-direction: column; gap: 12px;
-      min-height: 250px; max-height: 55vh; overflow-y: auto;
-      padding: 8px 2px 18px;
-    }
-    .message {
-      max-width: 90%; padding: 13px 15px;
-      border: 1px solid var(--border); border-radius: 14px;
-      line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap;
-    }
-    .message.user { align-self: flex-end; background: #351414; border-color: #702020; }
-    .message.model { align-self: flex-start; background: #1b1b1b; }
-    .label {
-      margin-bottom: 5px; color: var(--red); font-size: 11px;
-      font-weight: bold; letter-spacing: 1px;
-    }
-    #chatForm {
-      display: flex; gap: 9px; padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-    #messageInput {
-      min-width: 0; flex: 1; padding: 13px;
-      border: 1px solid var(--border); border-radius: 10px;
-      outline: none; background: #090909; color: white;
-    }
-    #messageInput:focus { border-color: var(--red); }
-    #notice, #loginNotice {
-      min-height: 20px; margin-top: 12px; color: var(--muted);
-      font-size: 13px; white-space: pre-wrap;
-    }
-    #memoryBar {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 10px; margin: 12px 0; padding: 12px;
-      border: 1px solid var(--border); border-radius: 10px;
-      color: var(--muted); font-size: 12px;
-    }
-    #memoryBar button { padding: 8px 10px; font-size: 12px; }
-    footer { padding: 20px; color: #666; font-size: 11px; text-align: center; }
-    @media (max-width: 480px) {
-      header { padding: 13px 10px; }
-      .brand { font-size: 20px; letter-spacing: 2px; }
-      main { padding: 14px 10px; }
-      .panel { padding: 15px; }
-      #userEmail { display: none; }
-      .message { max-width: 96%; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090d">
+<title>ULTRON v3</title>
+<style>
+:root{--bg:#09090d;--panel:#111116;--panel2:#17171e;--line:#2b2228;--red:#ff3048;--red2:#a80d25;--text:#f5f3f4;--muted:#aaa1a7;--green:#6ee7a0}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#260a13 0,transparent 40%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}button,input,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{border-right:1px solid var(--line);background:#0c0b10;padding:22px 15px;display:flex;flex-direction:column;gap:22px}.brand{display:flex;align-items:center;gap:11px;padding:5px 7px}.logo{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,var(--red),#700819);font-weight:900;box-shadow:0 0 24px #ff304833}.brand strong{font-size:18px;letter-spacing:2px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px}.nav{display:grid;gap:7px}.nav button,.logout{border:1px solid transparent;background:transparent;color:#c9c0c5;text-align:left;padding:12px 13px;border-radius:11px;display:flex;gap:11px;align-items:center}.nav button:hover,.nav button.active{background:#291019;border-color:#57202d;color:#fff}.nav button.active .navicon{color:var(--red)}.navicon{width:22px;text-align:center;font-size:17px}.sidebottom{margin-top:auto;display:grid;gap:12px}.userbox{border:1px solid var(--line);background:var(--panel);padding:12px;border-radius:12px;overflow-wrap:anywhere}.userbox small{color:var(--muted)}.main{min-width:0;padding:25px clamp(15px,4vw,42px);max-width:1300px;width:100%;margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}.eyebrow{color:var(--red);text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}.topbar h1{font-size:clamp(23px,3vw,31px);margin:4px 0 0}.status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}.dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block}.card{background:linear-gradient(145deg,#15141b,#101015);border:1px solid var(--line);border-radius:17px;padding:20px;margin-bottom:17px}.hero{padding:clamp(20px,4vw,34px);background:linear-gradient(110deg,#211018,#111116 70%);position:relative;overflow:hidden}.hero:after{content:'U';position:absolute;right:30px;top:-55px;font-size:240px;line-height:1;color:#ff30480b;font-weight:900;pointer-events:none}.hero h2{font-size:clamp(25px,4vw,39px);line-height:1.15;margin:9px 0 12px;max-width:600px}.hero p,.muted{color:var(--muted)}.hero p{max-width:620px}.btn{border:1px solid #5d2632;background:#291019;color:#fff;border-radius:10px;padding:11px 15px;font-weight:650}.btn:hover{filter:brightness(1.18)}.btn.primary{background:linear-gradient(135deg,var(--red),var(--red2));border-color:var(--red);box-shadow:0 7px 24px #ff30481c}.btn:disabled{opacity:.5;cursor:wait}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.tile{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;cursor:pointer;text-align:left;color:var(--text);min-height:135px}.tile:hover{border-color:#8d293d;transform:translateY(-1px)}.tile .tileicon{font-size:23px;margin-bottom:12px}.tile strong{display:block;font-size:15px}.tile small{color:var(--muted);display:block;margin-top:5px}.sectiontitle{margin:27px 0 13px;font-size:18px}.chatbox{height:min(55vh,520px);min-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:13px;padding:5px 2px 16px}.msg{max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px 15px;border-radius:14px}.msg.user{align-self:flex-end;background:#4a1422;border:1px solid #752338}.msg.bot{align-self:flex-start;background:#19181f;border:1px solid #302a31}.chatinput{display:flex;gap:9px;align-items:flex-end}.chatinput textarea{resize:vertical;min-height:48px;max-height:160px;flex:1;background:#0b0a0f;color:var(--text);border:1px solid #393039;border-radius:12px;padding:13px;outline:none}.chatinput textarea:focus,input:focus{border-color:var(--red)}.formrow{display:flex;gap:10px;flex-wrap:wrap}.formrow input{flex:1;min-width:180px}.field{width:100%;padding:12px;border:1px solid #393039;border-radius:10px;background:#0b0a0f;color:white}.memorylist{display:grid;gap:8px}.memoryitem{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:10px;background:#111015}.memoryitem span{overflow-wrap:anywhere}.danger{border-color:#6b2533;color:#ffb8c1;background:#2a0d15}.loginwrap{min-height:100vh;display:grid;place-items:center;padding:22px}.login{max-width:470px;width:100%;padding:30px;border:1px solid #47212a;border-radius:20px;background:#111015;box-shadow:0 20px 90px #0008}.login h1{font-size:32px;letter-spacing:3px;margin:8px 0}.login p{color:var(--muted)}.error{color:#ff9ca8;font-size:13px;white-space:pre-wrap}.hamb{display:none}.footer{color:#6e666b;font-size:11px;margin-top:25px}.badge{display:inline-block;color:#ff9aa8;background:#32101a;border:1px solid #632132;border-radius:20px;padding:3px 8px;font-size:11px}
+@media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{display:none;position:fixed;z-index:10;inset:0 auto 0 0;width:min(285px,85vw);box-shadow:15px 0 50px #0009}.sidebar.open{display:flex}.hamb{display:inline-block}.main{padding:19px 14px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero:after{right:-15px;font-size:170px}.msg{max-width:95%}}
+@media(max-width:460px){.grid{grid-template-columns:1fr}.topbar{align-items:flex-start}.status{font-size:10px}.card{padding:15px}.chatinput{align-items:stretch}.chatinput .btn{padding:10px}.brand strong{font-size:17px}}
+</style>
 </head>
 <body>
-  <header>
-    <div>
-      <div class="brand">ULTRON</div>
-      <div class="status" id="status">INICIALIZANDO SISTEMA...</div>
-    </div>
-    <div id="userBar" class="hidden">
-      <img id="userPhoto" alt="" class="hidden">
-      <span id="userEmail"></span>
-      <button id="logoutButton" type="button">Sair</button>
-    </div>
-  </header>
-
-  <main>
-    <section id="loginScreen" class="panel login-card">
-      <div class="orb">U</div>
-      <h1>ACESSO <span class="accent">ULTRON</span></h1>
-      <p class="muted">Autentique-se com sua conta Google para acessar seu assistente pessoal.</p>
-      <button id="loginButton" class="google-button" type="button">Entrar com Google</button>
-      <div id="loginNotice" role="status" class="muted"></div>
+<div id="loginScreen" class="loginwrap">
+  <section class="login">
+    <div class="brand" style="padding:0"><div class="logo">U</div><div><strong>ULTRON</strong><small>PERSONAL AI SYSTEM · V3</small></div></div>
+    <div class="eyebrow" style="margin-top:28px">Acesso seguro</div>
+    <h1>Bem-vindo.</h1>
+    <p>Entre para acessar seu painel, conversar com o ULTRON e consultar sua memória salva.</p>
+    <button id="loginBtn" class="btn primary" style="width:100%;margin-top:12px">Entrar com Google</button>
+    <p id="loginStatus" class="error" aria-live="polite"></p>
+    <p style="font-size:12px">Sua conta é autenticada pelo Firebase. A chave da API do Gemini deve ficar somente nas configurações do servidor Vercel.</p>
+  </section>
+</div>
+<div id="app" class="app hidden">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand"><div class="logo">U</div><div><strong>ULTRON</strong><small>PERSONAL AI · V3</small></div></div>
+    <nav class="nav" id="nav">
+      <button class="active" data-page="home"><span class="navicon">⌂</span>Início</button>
+      <button data-page="chat"><span class="navicon">◉</span>Chat</button>
+      <button data-page="code"><span class="navicon">⌘</span>Criar códigos</button>
+      <button data-page="projects"><span class="navicon">▣</span>Projetos</button>
+      <button data-page="injector"><span class="navicon">⟁</span>Injetor</button>
+      <button data-page="memory"><span class="navicon">◈</span>Memória</button>
+      <button data-page="settings"><span class="navicon">⚙</span>Configurações</button>
+    </nav>
+    <div class="sidebottom"><div class="userbox"><small>Conta conectada</small><div id="userEmail">Carregando…</div></div><button id="logoutBtn" class="logout">↪ Sair da conta</button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><button id="menuBtn" class="btn hamb" aria-label="Abrir menu">☰</button><div class="eyebrow">Sistema pessoal</div><h1 id="pageTitle">Painel de controle</h1></div><div class="status"><span class="dot"></span><span id="statusText">Conectando…</span></div></header>
+    <section id="page-home" class="page">
+      <div class="card hero"><div class="eyebrow">Interface operacional</div><h2>Como posso ajudar hoje?</h2><p>Converse com o ULTRON, planeje projetos ou peça ajuda para criar e revisar códigos. As funções disponíveis dependem das integrações configuradas.</p><button class="btn primary" data-goto="chat">Abrir chat&nbsp; →</button></div>
+      <h2 class="sectiontitle">Módulos</h2><div class="grid">
+        <button class="tile" data-goto="chat"><div class="tileicon">◉</div><strong>Chat ULTRON</strong><small>Converse com o assistente Gemini.</small></button>
+        <button class="tile" data-goto="code"><div class="tileicon">⌘</div><strong>Criar códigos</strong><small>Descreva o que deseja programar.</small></button>
+        <button class="tile" data-goto="projects"><div class="tileicon">▣</div><strong>Projetos</strong><small>Organize ideias e projetos locais.</small></button>
+        <button class="tile" data-goto="injector"><div class="tileicon">⟁</div><strong>Injetor</strong><small>Área de arquivos e ferramentas experimentais.</small></button>
+        <button class="tile" data-goto="memory"><div class="tileicon">◈</div><strong>Memória</strong><small>Consulte e gerencie informações salvas.</small></button>
+        <button class="tile" data-goto="settings"><div class="tileicon">⚙</div><strong>Configurações</strong><small>Conta e informações do sistema.</small></button>
+      </div><div class="footer">ULTRON V3 · Não execute códigos desconhecidos sem revisá-los.</div>
     </section>
-
-    <section id="chatScreen" class="panel hidden">
-      <h1>Olá. Eu sou o <span class="accent">ULTRON</span>.</h1>
-      <p class="muted">Sistema online. Como posso ajudar?</p>
-
-      <div id="memoryBar">
-        <span id="memoryCount">Memória: carregando...</span>
-        <button id="viewMemoryButton" type="button">Ver memória</button>
-      </div>
-
-      <div id="messages" aria-live="polite"></div>
-      <form id="chatForm">
-        <input id="messageInput" type="text" maxlength="4000"
-          placeholder="Digite sua mensagem..." autocomplete="off" required>
-        <button id="sendButton" type="submit">Enviar</button>
-      </form>
-      <div id="notice" role="status"></div>
-    </section>
+    <section id="page-chat" class="page hidden"><div class="card"><div id="chatbox" class="chatbox"><div class="msg bot">ULTRON online. Como posso ajudar?</div></div><div class="chatinput"><textarea id="messageInput" placeholder="Escreva uma mensagem…" rows="1"></textarea><button id="sendBtn" class="btn primary">Enviar</button></div><p class="muted" style="font-size:12px;margin-bottom:0">Dica: “Lembre que meu projeto se chama ULTRON” salva uma informação na memória.</p></div></section>
+    <section id="page-code" class="page hidden"><div class="card"><div class="eyebrow">Assistente de programação</div><h2>O que vamos construir?</h2><p class="muted">Descreva o código, a linguagem e o resultado esperado. O ULTRON enviará o pedido ao chat.</p><textarea id="codePrompt" class="field" rows="5" placeholder="Ex.: Crie uma página HTML responsiva com…"></textarea><button id="codeSend" class="btn primary" style="margin-top:12px">Enviar pedido ao ULTRON</button></div></section>
+    <section id="page-projects" class="page hidden"><div class="card"><div class="eyebrow">Organização</div><h2>Meus projetos</h2><p class="muted">Esta lista fica salva neste navegador e não é sincronizada automaticamente com a nuvem.</p><div class="formrow"><input id="projectName" class="field" placeholder="Nome do projeto"><button id="addProject" class="btn primary">Adicionar</button></div><div id="projectList" class="memorylist" style="margin-top:14px"></div></div></section>
+    <section id="page-injector" class="page hidden"><div class="card"><div class="eyebrow">Ferramentas experimentais</div><h2>Arquivos</h2><p class="muted">Você pode selecionar arquivos para ver seus nomes nesta página. Eles não serão executados, instalados nem injetados em outros aplicativos.</p><input id="filePicker" type="file" multiple class="field"><div id="fileList" class="memorylist" style="margin-top:14px"></div></div></section>
+    <section id="page-memory" class="page hidden"><div class="card"><div class="eyebrow">Contexto pessoal</div><h2>Memória do ULTRON</h2><p class="muted">A memória é salva na sua conta do Firestore. Para adicionar uma informação pelo chat, escreva “Lembre que …”.</p><div class="formrow"><input id="memoryInput" class="field" placeholder="Informação para guardar"><button id="saveMemory" class="btn primary">Guardar</button></div><div id="memoryList" class="memorylist" style="margin-top:14px"></div></div></section>
+    <section id="page-settings" class="page hidden"><div class="card"><div class="eyebrow">Sistema</div><h2>Configurações</h2><p class="muted">Conta conectada:</p><div id="settingsEmail"></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><p class="muted">Estado das integrações</p><div id="integrationStatus">Firebase: verificando…<br>API de chat: disponível quando o endpoint /api/chat estiver publicado.</div><button id="settingsLogout" class="btn danger" style="margin-top:18px">Sair da conta</button></div></section>
   </main>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
-  <footer>ULTRON v3 · ASSISTENTE PESSOAL</footer>
-
-  <script type="module">
-    import { initializeApp }
-      from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-
-    import {
-      getAuth, GoogleAuthProvider, signInWithPopup,
-      signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-
-    import {
-      getFirestore, doc, getDoc, setDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCzmyFYp1DfBL71oNvrSzssSxYqPxcP_14",
-      authDomain: "ultron-6a27a.firebaseapp.com",
-      projectId: "ultron-6a27a",
-      storageBucket: "ultron-6a27a.firebasestorage.app",
-      messagingSenderId: "825972778459",
-      appId: "1:825972778459:web:1cb1b29fb6fd702843f3fe"
-    };
-
-    const $ = id => document.getElementById(id);
-    const loginScreen = $("loginScreen");
-    const chatScreen = $("chatScreen");
-    const loginButton = $("loginButton");
-    const loginNotice = $("loginNotice");
-    const status = $("status");
-    const userBar = $("userBar");
-    const messagesBox = $("messages");
-    const chatForm = $("chatForm");
-    const messageInput = $("messageInput");
-    const sendButton = $("sendButton");
-    const notice = $("notice");
-    const memoryCount = $("memoryCount");
-
-    let auth;
-    let db;
-    let currentUser = null;
-    let history = [];
-    let savedMessages = [];
-    let memories = [];
-    let sending = false;
-    let authGeneration = 0;
-
-    function conversationRef(user) {
-      return doc(db, "users", user.uid, "conversations", "main");
+// Configuração pública do Firebase Web App ULTRON. Nunca coloque a chave secreta do Gemini aqui.
+const firebaseConfig = {
+  apiKey: 'AIzaSyCzmyFYp1DfBL71oNvrSzssSxYqPxcP_14',
+  authDomain: 'ultron-6a27a.firebaseapp.com',
+  projectId: 'ultron-6a27a',
+  storageBucket: 'ultron-6a27a.firebasestorage.app',
+  messagingSenderId: '825972778459',
+  appId: '1:825972778459:web:1cb1b29fb6fd702843f3fe'
+};
+const $ = id => document.getElementById(id);
+let auth, db, currentUser = null, memories = [], history = [], busy = false;
+const projectStorageKey = 'ultron_v3_projects';
+function setStatus(text){ $('statusText').textContent = text; }
+function showLoginError(text){ $('loginStatus').textContent = text || ''; }
+function showPage(name){
+  document.querySelectorAll('.page').forEach(el=>el.classList.add('hidden'));
+  const target = $('page-'+name); if(target) target.classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+  const titles={home:'Painel de controle',chat:'Chat ULTRON',code:'Criar códigos',projects:'Projetos',injector:'Injetor',memory:'Memória',settings:'Configurações'};
+  $('pageTitle').textContent=titles[name]||'ULTRON'; $('sidebar').classList.remove('open');
+  if(name==='chat') $('messageInput').focus();
+}
+function addMessage(text,who='bot',save=true){
+  const box=$('chatbox'); const empty=box.querySelector('.empty'); if(empty)empty.remove();
+  const el=document.createElement('div');el.className='msg '+(who==='user'?'user':'bot');el.textContent=text;box.appendChild(el);box.scrollTop=box.scrollHeight;
+  if(save){history.push({role:who==='user'?'user':'model',parts:[{text}]});if(history.length>40)history=history.slice(-40);}
+}
+function safeString(v,max=1000){return typeof v==='string'?v.trim().slice(0,max):'';}
+function conversationRef(){return doc(db,'users',currentUser.uid,'conversations','main');}
+function memoryRef(){return doc(db,'users',currentUser.uid,'memories','main');}
+async function loadUserData(){
+  try{
+    const [convSnap,memSnap]=await Promise.all([getDoc(conversationRef()),getDoc(memoryRef())]);
+    if(convSnap.exists()&&Array.isArray(convSnap.data().messages)){
+      history=convSnap.data().messages.filter(m=>m&&['user','model'].includes(m.role)&&Array.isArray(m.parts)).slice(-40);
+      const box=$('chatbox');box.innerHTML='';history.forEach(m=>{const txt=(m.parts||[]).map(p=>p.text||'').join('');const el=document.createElement('div');el.className='msg '+(m.role==='user'?'user':'bot');el.textContent=txt;box.appendChild(el)});if(!history.length)addMessage('ULTRON online. Como posso ajudar?','bot',false);box.scrollTop=box.scrollHeight;
     }
-
-    function memoryRef(user) {
-      return doc(db, "users", user.uid, "memories", "main");
-    }
-
-    function updateMemoryCount() {
-      memoryCount.textContent = `Memória: ${memories.length} informação(ões) salva(s)`;
-    }
-
-    function showLogin(message = "") {
-      loginScreen.classList.remove("hidden");
-      chatScreen.classList.add("hidden");
-      userBar.classList.add("hidden");
-      status.textContent = "AGUARDANDO AUTENTICAÇÃO";
-      loginNotice.textContent = message;
-    }
-
-    function showChat(user) {
-      loginScreen.classList.add("hidden");
-      chatScreen.classList.remove("hidden");
-      userBar.classList.remove("hidden");
-      status.textContent = "SISTEMA ONLINE";
-      $("userEmail").textContent = user.email || "Conta Google";
-
-      const photo = $("userPhoto");
-      if (user.photoURL) {
-        photo.src = user.photoURL;
-        photo.classList.remove("hidden");
-      } else {
-        photo.removeAttribute("src");
-        photo.classList.add("hidden");
-      }
-    }
-
-    function addMessage(role, text) {
-      const bubble = document.createElement("div");
-      bubble.className = `message ${role}`;
-
-      const label = document.createElement("div");
-      label.className = "label";
-      label.textContent = role === "user" ? "VOCÊ" : "ULTRON";
-
-      const content = document.createElement("div");
-      content.textContent = text;
-
-      bubble.append(label, content);
-      messagesBox.appendChild(bubble);
-      messagesBox.scrollTop = messagesBox.scrollHeight;
-    }
-
-    function renderMessages(messages) {
-      messagesBox.replaceChildren();
-      for (const item of messages) {
-        if (item && (item.role === "user" || item.role === "model") &&
-            typeof item.text === "string") {
-          addMessage(item.role, item.text);
-        }
-      }
-    }
-
-    async function loadConversation(user) {
-      const generation = authGeneration;
-      status.textContent = "CARREGANDO SISTEMA...";
-      notice.textContent = "Carregando conversas e memória...";
-      messagesBox.replaceChildren();
-      history = [];
-      savedMessages = [];
-      memories = [];
-
-      try {
-        const [conversationSnapshot, memorySnapshot] = await Promise.all([
-          getDoc(conversationRef(user)),
-          getDoc(memoryRef(user))
-        ]);
-
-        if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
-
-        if (conversationSnapshot.exists()) {
-          const data = conversationSnapshot.data();
-          const messages = Array.isArray(data.messages) ? data.messages : [];
-
-          savedMessages = messages
-            .filter(item => item &&
-              (item.role === "user" || item.role === "model") &&
-              typeof item.text === "string")
-            .slice(-40);
-
-          renderMessages(savedMessages);
-          history = savedMessages.slice(-12);
-        }
-
-        if (memorySnapshot.exists()) {
-          const data = memorySnapshot.data();
-          memories = Array.isArray(data.items)
-            ? data.items
-                .filter(item => typeof item === "string")
-                .slice(0, 30)
-            : [];
-        }
-
-        updateMemoryCount();
-        notice.textContent = "Conversas e memória carregadas.";
-        status.textContent = "SISTEMA ONLINE";
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-        notice.textContent =
-          "Erro ao carregar dados. Confira as regras do Firestore e sua conexão.";
-        status.textContent = "ERRO AO CARREGAR";
-      }
-
-      if (generation === authGeneration && currentUser?.uid === user.uid) {
-        messageInput.focus();
-      }
-    }
-
-    async function saveConversation(user) {
-      savedMessages = savedMessages.slice(-40);
-      await setDoc(conversationRef(user), {
-        messages: savedMessages,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    }
-
-    async function saveMemories(user) {
-      memories = memories.slice(0, 30);
-      await setDoc(memoryRef(user), {
-        items: memories,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-      updateMemoryCount();
-    }
-
-    function normalize(text) {
-      return text.trim().toLocaleLowerCase("pt-BR");
-    }
-
-    async function handleMemoryCommand(message, user) {
-      const text = message.trim();
-
-      const rememberMatch = text.match(/^(?:ultron[, ]*)?(?:lembre que|lembre-se de que|guarde que|salve na memória que)\s+(.+)$/i);
-
-      if (rememberMatch) {
-        const fact = rememberMatch[1].trim().replace(/[.!]+$/, "");
-        if (!fact) return null;
-
-        const exists = memories.some(item => normalize(item) === normalize(fact));
-        if (exists) {
-          return "Essa informação já está salva na minha memória.";
-        }
-
-        memories.unshift(fact);
-        memories = memories.slice(0, 30);
-
-        try {
-          await saveMemories(user);
-          return `Informação salva na memória: "${fact}". Vou considerá-la nas próximas conversas.`;
-        } catch (error) {
-          console.error("Erro ao salvar memória:", error);
-          memories = memories.filter(item => normalize(item) !== normalize(fact));
-          throw new Error("Não consegui salvar essa informação. Confira as regras do Firestore.");
-        }
-      }
-
-      if (/^(?:o que você lembra|o que voce lembra|ver memória|ver memoria|mostre sua memória|mostre sua memoria)\??$/i.test(text)) {
-        return memories.length
-          ? "Estas são as informações salvas na minha memória:\n\n" +
-            memories.map((item, index) => `${index + 1}. ${item}`).join("\n")
-          : "Ainda não tenho informações salvas. Você pode dizer: “Lembre que meu projeto se chama ULTRON”.";
-      }
-
-      const forgetMatch = text.match(/^(?:ultron[, ]*)?(?:esqueça que|esqueca que|apague da memória que|apague da memoria que)\s+(.+)$/i);
-
-      if (forgetMatch) {
-        const target = normalize(forgetMatch[1].replace(/[.!]+$/, ""));
-        const oldMemories = [...memories];
-        memories = memories.filter(item => {
-          const normalized = normalize(item);
-          return normalized !== target && !normalized.includes(target);
-        });
-
-        if (memories.length === oldMemories.length) {
-          return "Não encontrei essa informação na memória.";
-        }
-
-        try {
-          await saveMemories(user);
-          return "Informação removida da memória.";
-        } catch (error) {
-          memories = oldMemories;
-          throw new Error("Não consegui atualizar a memória no Firestore.");
-        }
-      }
-
-      return null;
-    }
-
-    async function startLogin() {
-      loginNotice.textContent = "";
-      loginButton.disabled = true;
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
-
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        if (error.code === "auth/popup-blocked" ||
-            error.code === "auth/operation-not-supported-in-this-environment") {
-          try {
-            await signInWithRedirect(auth, provider);
-            return;
-          } catch (redirectError) {
-            console.error("Erro no redirecionamento:", redirectError);
-            loginNotice.textContent = "Não foi possível iniciar o login.";
-          }
-        } else if (error.code === "auth/popup-closed-by-user") {
-          loginNotice.textContent = "Login cancelado. Tente novamente.";
-        } else {
-          console.error("Erro no login:", error.code, error.message);
-          loginNotice.textContent =
-            "Falha no login. Confira os domínios autorizados e o provedor Google no Firebase.";
-        }
-      } finally {
-        loginButton.disabled = false;
-      }
-    }
-
-    loginButton.addEventListener("click", startLogin);
-
-    $("logoutButton").addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        console.error("Erro ao sair:", error);
-        notice.textContent = "Não foi possível sair da conta.";
-      }
-    });
-
-    $("viewMemoryButton").addEventListener("click", () => {
-      addMessage(
-        "model",
-        memories.length
-          ? "Informações na memória:\n\n" +
-            memories.map((item, index) => `${index + 1}. ${item}`).join("\n")
-          : "Ainda não há informações salvas. Experimente: “Lembre que meu projeto se chama ULTRON”."
-      );
-    });
-
-    chatForm.addEventListener("submit", async event => {
-      event.preventDefault();
-      const message = messageInput.value.trim();
-      if (!message || sending || !currentUser) return;
-
-      const user = currentUser;
-      const generation = authGeneration;
-
-      sending = true;
-      sendButton.disabled = true;
-      messageInput.disabled = true;
-      notice.textContent = "ULTRON está processando...";
-      addMessage("user", message);
-      messageInput.value = "";
-
-      try {
-        const memoryReply = await handleMemoryCommand(message, user);
-
-        if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
-
-        if (memoryReply !== null) {
-          addMessage("model", memoryReply);
-
-          const pair = [
-            { role: "user", text: message },
-            { role: "model", text: memoryReply }
-          ];
-
-          history.push(...pair);
-          history = history.slice(-12);
-          savedMessages.push(...pair);
-          savedMessages = savedMessages.slice(-40);
-
-          await saveConversation(user);
-          notice.textContent = "Memória atualizada e conversa salva na nuvem.";
-          return;
-        }
-
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message,
-            history,
-            memories
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Não foi possível obter uma resposta.");
-        }
-
-        if (typeof data.reply !== "string" || !data.reply.trim()) {
-          throw new Error("O ULTRON não retornou uma resposta válida.");
-        }
-
-        if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
-
-        addMessage("model", data.reply);
-
-        const pair = [
-          { role: "user", text: message },
-          { role: "model", text: data.reply }
-        ];
-
-        history.push(...pair);
-        history = history.slice(-12);
-        savedMessages.push(...pair);
-        savedMessages = savedMessages.slice(-40);
-
-        notice.textContent = "Salvando conversa na nuvem...";
-        await saveConversation(user);
-
-        if (generation === authGeneration && currentUser?.uid === user.uid) {
-          notice.textContent = "Conversa salva na nuvem.";
-        }
-      } catch (error) {
-        console.error("Erro no chat:", error);
-        if (generation === authGeneration && currentUser?.uid === user.uid) {
-          notice.textContent = error.message || "Erro de conexão. Tente novamente.";
-        }
-      } finally {
-        sending = false;
-        sendButton.disabled = false;
-        messageInput.disabled = false;
-        if (currentUser) messageInput.focus();
-      }
-    });
-
-    async function initialize() {
-      try {
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        await getRedirectResult(auth).catch(error => {
-          console.error("Resultado do login:", error.code, error.message);
-        });
-
-        onAuthStateChanged(auth, async user => {
-          authGeneration++;
-          const generation = authGeneration;
-          currentUser = user;
-
-          if (!user) {
-            history = [];
-            savedMessages = [];
-            memories = [];
-            messagesBox.replaceChildren();
-            memoryCount.textContent = "Memória indisponível";
-            notice.textContent = "";
-            showLogin();
-            return;
-          }
-
-          showChat(user);
-          await loadConversation(user);
-          if (generation !== authGeneration) return;
-        });
-      } catch (error) {
-        console.error("Erro de inicialização:", error);
-        status.textContent = "ERRO DE CONFIGURAÇÃO";
-        showLogin("Confira a configuração do Firebase e a conexão.");
-      }
-    }
-
-    initialize();
-  </script>
-</body>
-</html>
+    if(memSnap.exists()&&Array.isArray(memSnap.data().items))memories=memSnap.data().items.filter(x=>typeof x==='string').slice(0,30);
+    renderMemories();setStatus('Conectado');$('integrationStatus').textContent='Firebase: conectado.\nAPI de chat: será verificada ao enviar uma mensagem.';
+  }catch(e){setStatus('Conectado com aviso');$('integrationStatus').textContent='Firebase: não foi possível carregar histórico/memória. Verifique as regras do Firestore.\n'+(e.message||'');console.error(e)}
+}
+async function saveHistory(){try{await setDoc(conversationRef(),{messages:history.slice(-40),updatedAt:serverTimestamp()},{merge:true})}catch(e){console.error('Falha ao salvar conversa:',e)}}
+async function saveMemories(){try{await setDoc(memoryRef(),{items:memories.slice(0,30),updatedAt:serverTimestamp()},{merge:true});renderMemories()}catch(e){alert('Não consegui salvar a memória. Confira as regras do Firestore.');console.error(e)}}
+function renderMemories(){const box=$('memoryList');box.innerHTML='';if(!memories.length){box.innerHTML='<p class="muted">Nenhuma informação salva ainda.</p>';return}memories.forEach((item,i)=>{const row=document.createElement('div');row.className='memoryitem';const span=document.createElement('span');span.textContent=item;const btn=document.createElement('button');btn.className='btn danger';btn.textContent='Apagar';btn.addEventListener('click',async()=>{memories.splice(i,1);await saveMemories()});row.append(span,btn);box.appendChild(row)})}
+async function handleMemoryCommand(message){
+  const lower=message.toLocaleLowerCase('pt-BR');
+  const savePrefixes=['lembre que ','lembre-se de que ','guarde que ','salve na memória que ','salve na memoria que '];
+  const prefix=savePrefixes.find(p=>lower.startsWith(p));
+  if(prefix){const item=safeString(message.slice(prefix.length),500);if(!item)return 'Escreva a informação depois de “Lembre que”.';memories=[item,...memories.filter(x=>x.toLocaleLowerCase('pt-BR')!==item.toLocaleLowerCase('pt-BR'))].slice(0,30);await saveMemories();return 'Informação salva na sua memória.'}
+  if(['o que você lembra?','o que voce lembra?','ver memória','ver memoria','mostre sua memória','mostre sua memoria'].includes(lower))return memories.length?'Estas são as informações salvas:\n- '+memories.join('\n- '):'Ainda não há informações salvas na memória.';
+  const deletePrefixes=['esqueça que ','esqueca que ','apague da memória que ','apague da memoria que '];const dp=deletePrefixes.find(p=>lower.startsWith(p));
+  if(dp){const target=safeString(message.slice(dp.length),500).toLocaleLowerCase('pt-BR');const before=memories.length;memories=memories.filter(x=>!x.toLocaleLowerCase('pt-BR').includes(target));if(before===memories.length)return 'Não encontrei essa informação na memória.';await saveMemories();return 'Informação removida da memória.'}
+  return null;
+}
+async function sendMessage(override){
+  if(busy||!currentUser)return;const input=$('messageInput');const message=safeString(override??input.value,5000);if(!message)return;
+  input.value='';addMessage(message,'user');await saveHistory();
+  const localAnswer=await handleMemoryCommand(message);if(localAnswer){addMessage(localAnswer,'bot');await saveHistory();return}
+  busy=true;$('sendBtn').disabled=true;$('sendBtn').textContent='…';setStatus('Pensando…');
+  try{
+    const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history:history.slice(-12,-1),memories})});
+    const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||data.message||`Erro HTTP ${response.status}`);
+    const answer=safeString(data.reply||data.response||data.text||data.answer,12000);if(!answer)throw new Error('A API respondeu, mas não retornou texto. Confira api/chat.js e a variável GEMINI_API_KEY no Vercel.');addMessage(answer,'bot');await saveHistory();setStatus('Conectado');
+  }catch(e){addMessage('Não consegui falar com a API. '+(e.message||'Verifique /api/chat e a configuração do Vercel.'),'bot');setStatus('Erro na API');console.error(e)}
+  finally{busy=false;$('sendBtn').disabled=false;$('sendBtn').textContent='Enviar';input.focus()}
+}
+async function login(){showLoginEr
