@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#090909">
   <title>ULTRON | Assistente Pessoal</title>
-
   <style>
     :root {
       color-scheme: dark;
@@ -17,203 +16,83 @@
       --text: #f2f2f2;
       --muted: #999;
     }
-
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
+      margin: 0; min-height: 100vh; background: var(--bg);
+      color: var(--text); font-family: Arial, sans-serif;
     }
-
     button, input { font: inherit; }
-
     button {
-      cursor: pointer;
-      border: 1px solid var(--red);
-      border-radius: 10px;
-      padding: 12px 16px;
-      background: var(--red);
-      color: white;
-      font-weight: bold;
+      cursor: pointer; border: 1px solid var(--red);
+      border-radius: 10px; padding: 12px 16px;
+      background: var(--red); color: white; font-weight: bold;
     }
-
-    button:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
+    button:disabled { opacity: .5; cursor: not-allowed; }
     .hidden { display: none !important; }
-
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 16px; border-bottom: 1px solid var(--border);
       background: #0d0d0d;
     }
-
     .brand {
-      color: var(--red);
-      font-size: 24px;
-      font-weight: 900;
+      color: var(--red); font-size: 24px; font-weight: 900;
       letter-spacing: 4px;
     }
-
-    .status {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    main {
-      width: min(850px, 100%);
-      margin: auto;
-      padding: 20px 14px;
-    }
-
+    .status { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    main { width: min(850px, 100%); margin: auto; padding: 20px 14px; }
     .panel {
-      padding: 22px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--panel);
+      padding: 22px; border: 1px solid var(--border);
+      border-radius: 16px; background: var(--panel);
     }
-
     h1 { margin-top: 0; }
-
     .accent { color: var(--red); }
-
-    .muted {
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .login-card {
-      max-width: 440px;
-      margin: 45px auto;
-      text-align: center;
-    }
-
+    .muted { color: var(--muted); line-height: 1.6; }
+    .login-card { max-width: 440px; margin: 45px auto; text-align: center; }
     .orb {
-      width: 92px;
-      height: 92px;
-      margin: 8px auto 24px;
-      border: 2px solid var(--red);
-      border-radius: 50%;
-      box-shadow: 0 0 30px #ff303044,
-                  inset 0 0 22px #ff303033;
-      display: grid;
-      place-items: center;
-      color: var(--red);
-      font-size: 30px;
-      font-weight: 900;
+      width: 92px; height: 92px; margin: 8px auto 24px;
+      border: 2px solid var(--red); border-radius: 50%;
+      box-shadow: 0 0 30px #ff303044, inset 0 0 22px #ff303033;
+      display: grid; place-items: center; color: var(--red);
+      font-size: 30px; font-weight: 900;
     }
-
     .google-button {
-      width: 100%;
-      margin-top: 16px;
-      background: #f2f2f2;
-      color: #171717;
-      border-color: #f2f2f2;
+      width: 100%; margin-top: 16px;
+      background: #f2f2f2; color: #171717; border-color: #f2f2f2;
     }
-
-    #userBar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-    }
-
-    #userPhoto {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-    }
-
-    #logoutButton {
-      padding: 8px 10px;
-      background: transparent;
-      font-size: 12px;
-    }
-
+    #userBar { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    #userPhoto { width: 34px; height: 34px; border-radius: 50%; }
+    #logoutButton { padding: 8px 10px; background: transparent; font-size: 12px; }
     #messages {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: 250px;
-      max-height: 55vh;
-      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 12px;
+      min-height: 250px; max-height: 55vh; overflow-y: auto;
       padding: 8px 2px 18px;
     }
-
     .message {
-      max-width: 90%;
-      padding: 13px 15px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      line-height: 1.55;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
+      max-width: 90%; padding: 13px 15px;
+      border: 1px solid var(--border); border-radius: 14px;
+      line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap;
     }
-
-    .message.user {
-      align-self: flex-end;
-      background: #351414;
-      border-color: #702020;
-    }
-
-    .message.model {
-      align-self: flex-start;
-      background: #1b1b1b;
-    }
-
+    .message.user { align-self: flex-end; background: #351414; border-color: #702020; }
+    .message.model { align-self: flex-start; background: #1b1b1b; }
     .label {
-      margin-bottom: 5px;
-      color: var(--red);
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 1px;
+      margin-bottom: 5px; color: var(--red); font-size: 11px;
+      font-weight: bold; letter-spacing: 1px;
     }
-
     #chatForm {
-      display: flex;
-      gap: 9px;
-      padding-top: 14px;
+      display: flex; gap: 9px; padding-top: 14px;
       border-top: 1px solid var(--border);
     }
-
     #messageInput {
-      min-width: 0;
-      flex: 1;
-      padding: 13px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      background: #090909;
-      color: white;
+      min-width: 0; flex: 1; padding: 13px;
+      border: 1px solid var(--border); border-radius: 10px;
+      outline: none; background: #090909; color: white;
     }
-
     #messageInput:focus { border-color: var(--red); }
-
-    #notice {
-      min-height: 20px;
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      white-space: pre-wrap;
+    #notice, #loginNotice {
+      min-height: 20px; margin-top: 12px; color: var(--muted);
+      font-size: 13px; white-space: pre-wrap;
     }
-
-    footer {
-      padding: 20px;
-      color: #666;
-      font-size: 11px;
-      text-align: center;
-    }
-
+    footer { padding: 20px; color: #666; font-size: 11px; text-align: center; }
     @media (max-width: 480px) {
       header { padding: 13px 10px; }
       .brand { font-size: 20px; letter-spacing: 2px; }
@@ -224,14 +103,12 @@
     }
   </style>
 </head>
-
 <body>
   <header>
     <div>
       <div class="brand">ULTRON</div>
       <div class="status" id="status">INICIALIZANDO SISTEMA...</div>
     </div>
-
     <div id="userBar" class="hidden">
       <img id="userPhoto" alt="" class="hidden">
       <span id="userEmail"></span>
@@ -244,8 +121,7 @@
       <div class="orb">U</div>
       <h1>ACESSO <span class="accent">ULTRON</span></h1>
       <p class="muted">
-        Autentique-se com sua conta Google para acessar
-        seu assistente pessoal.
+        Autentique-se com sua conta Google para acessar seu assistente pessoal.
       </p>
       <button id="loginButton" class="google-button" type="button">
         Entrar com Google
@@ -256,21 +132,12 @@
     <section id="chatScreen" class="panel hidden">
       <h1>Olá. Eu sou o <span class="accent">ULTRON</span>.</h1>
       <p class="muted">Sistema online. Como posso ajudar?</p>
-
       <div id="messages" aria-live="polite"></div>
-
       <form id="chatForm">
-        <input
-          id="messageInput"
-          type="text"
-          maxlength="4000"
-          placeholder="Digite sua mensagem..."
-          autocomplete="off"
-          required
-        >
+        <input id="messageInput" type="text" maxlength="4000"
+          placeholder="Digite sua mensagem..." autocomplete="off" required>
         <button id="sendButton" type="submit">Enviar</button>
       </form>
-
       <div id="notice" role="status"></div>
     </section>
   </main>
@@ -282,20 +149,15 @@
       from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 
     import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signInWithRedirect,
-      getRedirectResult,
-      onAuthStateChanged,
-      signOut
+      getAuth, GoogleAuthProvider, signInWithPopup,
+      signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut
     } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
-    /*
-      COLE OS DADOS DO SEU APLICATIVO WEB FIREBASE AQUI.
-      Substitua os valores de exemplo pelos valores reais.
-      Não coloque a chave privada do Gemini neste arquivo.
-    */
+    import {
+      getFirestore, doc, getDoc, setDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    // Configuração do aplicativo Firebase.
     const firebaseConfig = {
       apiKey: "AIzaSyCzmyFYp1DfBL71oNvrSzssSxYqPxcP_14",
       authDomain: "ultron-6a27a.firebaseapp.com",
@@ -305,7 +167,7 @@
       appId: "1:825972778459:web:1cb1b29fb6fd702843f3fe"
     };
 
-    const $ = (id) => document.getElementById(id);
+    const $ = id => document.getElementById(id);
 
     const loginScreen = $("loginScreen");
     const chatScreen = $("chatScreen");
@@ -320,9 +182,17 @@
     const notice = $("notice");
 
     let auth;
+    let db;
     let currentUser = null;
     let history = [];
+    let savedMessages = [];
     let sending = false;
+    let authGeneration = 0;
+
+    // Cada conta possui seu próprio documento de conversas.
+    function conversationRef(user) {
+      return doc(db, "users", user.uid, "conversations", "main");
+    }
 
     function showLogin(message = "") {
       loginScreen.classList.remove("hidden");
@@ -333,7 +203,6 @@
     }
 
     function showChat(user) {
-      currentUser = user;
       loginScreen.classList.add("hidden");
       chatScreen.classList.remove("hidden");
       userBar.classList.remove("hidden");
@@ -345,10 +214,9 @@
         photo.src = user.photoURL;
         photo.classList.remove("hidden");
       } else {
+        photo.removeAttribute("src");
         photo.classList.add("hidden");
       }
-
-      messageInput.focus();
     }
 
     function addMessage(role, text) {
@@ -365,6 +233,77 @@
       bubble.append(label, content);
       messagesBox.appendChild(bubble);
       messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+
+    function renderMessages(messages) {
+      messagesBox.replaceChildren();
+      for (const item of messages) {
+        if (
+          item &&
+          (item.role === "user" || item.role === "model") &&
+          typeof item.text === "string"
+        ) {
+          addMessage(item.role, item.text);
+        }
+      }
+    }
+
+    async function loadConversation(user) {
+      const generation = authGeneration;
+      status.textContent = "CARREGANDO MEMÓRIA...";
+      notice.textContent = "Buscando conversas salvas na nuvem...";
+      messagesBox.replaceChildren();
+      history = [];
+      savedMessages = [];
+
+      try {
+        const snapshot = await getDoc(conversationRef(user));
+
+        if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
+
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          const messages = Array.isArray(data.messages) ? data.messages : [];
+
+          savedMessages = messages
+            .filter(item =>
+              item &&
+              (item.role === "user" || item.role === "model") &&
+              typeof item.text === "string"
+            )
+            .slice(-40);
+
+          renderMessages(savedMessages);
+          history = savedMessages.slice(-12).map(item => ({
+            role: item.role,
+            text: item.text
+          }));
+          notice.textContent = "Memória carregada.";
+        } else {
+          notice.textContent = "Memória pronta. Esta é sua primeira conversa salva.";
+        }
+
+        status.textContent = "SISTEMA ONLINE";
+      } catch (error) {
+        console.error("Erro ao carregar memória:", error);
+        notice.textContent =
+          "Não foi possível carregar a memória. Confira as regras do Firestore e sua conexão.";
+        status.textContent = "MEMÓRIA INDISPONÍVEL";
+      }
+
+      if (generation === authGeneration && currentUser?.uid === user.uid) {
+        messageInput.focus();
+      }
+    }
+
+    async function saveConversation(user) {
+      // Mantém no máximo 40 mensagens para limitar o tamanho do documento.
+      savedMessages = savedMessages.slice(-40);
+
+      await setDoc(conversationRef(user), {
+        messages: savedMessages,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
     }
 
     async function startLogin() {
@@ -385,8 +324,8 @@
             await signInWithRedirect(auth, provider);
             return;
           } catch (redirectError) {
-            loginNotice.textContent =
-              "Não foi possível iniciar o login. Verifique a configuração do Firebase.";
+            console.error("Erro no redirecionamento:", redirectError);
+            loginNotice.textContent = "Não foi possível iniciar o login.";
           }
         } else if (error.code === "auth/popup-closed-by-user") {
           loginNotice.textContent = "Login cancelado. Tente novamente.";
@@ -405,20 +344,20 @@
     $("logoutButton").addEventListener("click", async () => {
       try {
         await signOut(auth);
-        history = [];
-        messagesBox.replaceChildren();
-        showLogin();
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao sair:", error);
         notice.textContent = "Não foi possível sair da conta.";
       }
     });
 
-    chatForm.addEventListener("submit", async (event) => {
+    chatForm.addEventListener("submit", async event => {
       event.preventDefault();
 
       const message = messageInput.value.trim();
       if (!message || sending || !currentUser) return;
+
+      const user = currentUser;
+      const generation = authGeneration;
 
       sending = true;
       sendButton.disabled = true;
@@ -444,62 +383,82 @@
           throw new Error("O ULTRON não retornou uma resposta válida.");
         }
 
+        if (generation !== authGeneration || currentUser?.uid !== user.uid) return;
+
         addMessage("model", data.reply);
 
-        history.push(
+        const pair = [
           { role: "user", text: message },
           { role: "model", text: data.reply }
-        );
+        ];
+
+        history.push(...pair);
         history = history.slice(-12);
-        notice.textContent = "";
+
+        savedMessages.push(...pair);
+        savedMessages = savedMessages.slice(-40);
+
+        notice.textContent = "Salvando conversa na nuvem...";
+
+        try {
+          await saveConversation(user);
+
+          if (generation === authGeneration && currentUser?.uid === user.uid) {
+            notice.textContent = "Conversa salva na nuvem.";
+          }
+        } catch (saveError) {
+          console.error("Erro ao salvar no Firestore:", saveError);
+          notice.textContent =
+            "Resposta recebida, mas não foi possível salvar na nuvem. Confira as regras do Firestore.";
+        }
       } catch (error) {
         console.error("Erro no chat:", error);
-        notice.textContent = error.message ||
-          "Erro de conexão. Tente novamente.";
-
-        // Retira a mensagem mais recente do histórico visual
-        // não é necessário recarregar a página.
+        if (generation === authGeneration && currentUser?.uid === user.uid) {
+          notice.textContent = error.message || "Erro de conexão. Tente novamente.";
+        }
       } finally {
         sending = false;
         sendButton.disabled = false;
         messageInput.disabled = false;
-        messageInput.focus();
+
+        if (currentUser) messageInput.focus();
       }
     });
 
     async function initialize() {
-      const values = Object.values(firebaseConfig);
-      const invalid = values.some(
-        value => !value || value.startsWith("COLE_AQUI")
-      );
-
-      if (invalid) {
-        status.textContent = "CONFIGURAÇÃO PENDENTE";
-        showLogin("Falta preencher a configuração do Firebase no código.");
-        loginButton.disabled = true;
-        return;
-      }
-
       try {
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
+        db = getFirestore(app);
 
         await getRedirectResult(auth).catch(error => {
-          console.error("Resultado do login:", error.code);
+          console.error("Resultado do login:", error.code, error.message);
         });
 
-        onAuthStateChanged(auth, (user) => {
-          if (user) {
-            showChat(user);
-          } else {
-            currentUser = null;
+        onAuthStateChanged(auth, async user => {
+          authGeneration++;
+          const generation = authGeneration;
+          currentUser = user;
+
+          if (!user) {
+            history = [];
+            savedMessages = [];
+            messagesBox.replaceChildren();
+            notice.textContent = "";
             showLogin();
+            return;
           }
+
+          showChat(user);
+          await loadConversation(user);
+
+          // Impede que uma operação antiga altere a tela após trocar de conta.
+          if (generation !== authGeneration) return;
         });
       } catch (error) {
         console.error("Erro de inicialização:", error);
         status.textContent = "ERRO DE CONFIGURAÇÃO";
-        showLogin("Confira os dados do Firebase e tente novamente.");
+        showLogin("Confira a configuração do Firebase e a conexão.");
       }
     }
 
