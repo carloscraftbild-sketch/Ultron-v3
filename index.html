@@ -129,4 +129,47 @@ async function sendMessage(override){
   }catch(e){addMessage('Não consegui falar com a API. '+(e.message||'Verifique /api/chat e a configuração do Vercel.'),'bot');setStatus('Erro na API');console.error(e)}
   finally{busy=false;$('sendBtn').disabled=false;$('sendBtn').textContent='Enviar';input.focus()}
 }
-async function login(){showLoginEr
+async function login(){
+  showLoginError('');
+  const button=$('loginBtn');
+  button.disabled=true;
+  button.textContent='Conectando ao Google…';
+  try{
+    if(!auth) throw new Error('O Firebase ainda está iniciando. Aguarde alguns segundos e tente novamente.');
+    const provider=new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    // No Android, o redirecionamento costuma ser mais confiável que pop-ups.
+    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){
+      button.textContent='Redirecionando para o Google…';
+      await signInWithRedirect(auth,provider);
+      return;
+    }
+    await signInWithPopup(auth,provider);
+  }catch(e){
+    console.error('Login Firebase:',e);
+    let msg=e?.message||'Erro ao entrar.';
+    if(e?.code==='auth/unauthorized-domain') msg='Este domínio não está autorizado no Firebase Authentication.';
+    else if(e?.code==='auth/operation-not-allowed') msg='O provedor Google não está ativado em Firebase Authentication.';
+    else if(e?.code==='auth/popup-blocked') msg='O navegador bloqueou a janela de login. Tente novamente ou permita pop-ups.';
+    else if(e?.code==='auth/network-request-failed') msg='Falha de conexão. Verifique a internet e tente novamente.';
+    showLoginError(msg);
+    button.disabled=false;
+    button.textContent='Entrar com Google';
+  }
+}
+function loadProjects(){let list=[];try{list=JSON.parse(localStorage.getItem(projectStorageKey)||'[]')}catch{}const box=$('projectList');box.innerHTML='';if(!list.length){box.innerHTML='<p class="muted">Nenhum projeto adicionado.</p>';return}list.forEach((name,i)=>{const row=document.createElement('div');row.className='memoryitem';const span=document.createElement('span');span.textContent=name;const del=document.createElement('button');del.className='btn danger';del.textContent='Apagar';del.onclick=()=>{list.splice(i,1);localStorage.setItem(projectStorageKey,JSON.stringify(list));loadProjects()};row.append(span,del);box.append(row)})}
+$('loginBtn').addEventListener('click',login);$('logoutBtn').addEventListener('click',()=>signOut(auth));$('settingsLogout').addEventListener('click',()=>signOut(auth));
+$('nav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)showPage(b.dataset.page)});document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.goto)));
+$('menuBtn').addEventListener('click',()=>$('sidebar').classList.toggle('open'));
+$('sendBtn').addEventListener('click',()=>sendMessage());$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+$('codeSend').addEventListener('click',()=>{const prompt=safeString($('codePrompt').value,4000);if(!prompt){$('codePrompt').focus();return}showPage('chat');sendMessage('Ajude-me a criar código para esta solicitação. Explique como usar e forneça o código completo quando possível:\n\n'+prompt);$('codePrompt').value=''});
+$('saveMemory').addEventListener('click',async()=>{const item=safeString($('memoryInput').value,500);if(!item)return;memories=[item,...memories.filter(x=>x!==item)].slice(0,30);$('memoryInput').value='';await saveMemories()});
+$('addProject').addEventListener('click',()=>{const name=safeString($('projectName').value,100);if(!name)return;let list=[];try{list=JSON.parse(localStorage.getItem(projectStorageKey)||'[]')}catch{}list.unshift(name);localStorage.setItem(projectStorageKey,JSON.stringify(list.slice(0,50)));$('projectName').value='';loadProjects()});
+$('filePicker').addEventListener('change',()=>{const box=$('fileList');box.innerHTML='';[...$('filePicker').files].forEach(file=>{const row=document.createElement('div');row.className='memoryitem';const span=document.createElement('span');span.textContent=`${file.name} · ${(file.size/1024).toFixed(1)} KB`;row.appendChild(span);box.appendChild(row)})});
+async function start(){try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);try{await getRedirectResult(auth)}catch(e){console.warn('Resultado de redirecionamento:',e)}onAuthStateChanged(auth,async user=>{currentUser=user;if(user){$('loginScreen').classList.add('hidden');$('app').classList.remove('hidden');$('userEmail').textContent=user.email||user.displayName||'Conta Google';$('settingsEmail').textContent=user.email||user.displayName||'';setStatus('Carregando…');loadProjects();await loadUserData()}else{$('app').classList.add('hidden');$('loginScreen').classList.remove('hidden');setStatus('Desconectado')}})}catch(e){console.error('Inicialização Firebase:',e);showLoginError('O Firebase não inicializou: '+(e.message||e));$('loginBtn').disabled=false;$('loginBtn').textContent='Tentar novamente'}}
+start();
+</script>
+</body>
+</html>
+
