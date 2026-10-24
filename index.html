@@ -198,7 +198,10 @@ textarea.field{resize:vertical}
           </div>
           <pre><code id="codeOutput"></code></pre>
         </div>
-        <div class="btnrow"><button id="saveCodeProject" class="btn">Salvar como projeto</button></div>
+        <<div class="btnrow">
+  <button id="saveCodeProject" class="btn">Salvar como projeto</button>
+  <button id="sendCodeToInjector" class="btn primary">Abrir no Injetor</button>
+</div>
         <p id="codeActionStatus" class="smallmuted"></p>
       </div>
     </section>
@@ -562,13 +565,32 @@ function downloadText(filename,content){
   a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function saveGeneratedAsProject(){
-  if(!generatedCode)return;
-  const filename=normalizeFilename($('codeFilename').value,$('codeLanguage').value);
-  const name=safeString($('projectName').value,100)||filename;
-  projects.unshift({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,filename,code:generatedCode,savedAt:new Date().toISOString()});
-  projects=projects.slice(0,30);saveLocalProjects();$('projectName').value='';
-  persistProjects();$('codeActionStatus').textContent='Projeto salvo. Veja a lista de projetos.';
+function sendGeneratedToInjector(){
+  if(!generatedCode){
+    $('codeActionStatus').textContent='Gere um código primeiro.';
+    return;
+  }
+
+  const filename=normalizeFilename(
+    $('codeFilename').value,
+    $('codeLanguage').value
+  );
+
+  const id='generated-'+Date.now();
+
+  const file={
+    id,
+    name:safeFileName(filename),
+    content:generatedCode
+  };
+
+  files.push(file);
+  renderFiles();
+  openEditor(id);
+  showPage('injector');
+
+  $('injectorStatus').textContent=
+    'Código recebido da aba Códigos. Você pode editá-lo.';
 }
 
 function safeFileName(name){
@@ -653,6 +675,7 @@ $('codeClear').addEventListener('click',()=>{$('codePrompt').value='';$('codeSta
 $('copyCode').addEventListener('click',copyGeneratedCode);
 $('downloadCode').addEventListener('click',()=>generatedCode&&downloadText(normalizeFilename($('codeFilename').value,$('codeLanguage').value),generatedCode));
 $('saveCodeProject').addEventListener('click',saveGeneratedAsProject);
+  $('sendCodeToInjector').addEventListener('click',sendGeneratedToInjector);
 $('saveMemory').addEventListener('click',async()=>{
   const item=safeString($('memoryInput').value,500);if(!item)return;
   memories=[item,...memories.filter(x=>x!==item)].slice(0,30);
