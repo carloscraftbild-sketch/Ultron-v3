@@ -1,683 +1,353 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#09090d">
-<title>ULTRON v4</title>
+<title>ULTRON V4</title>
 <style>
 :root{--bg:#09090d;--panel:#141219;--line:#38232c;--red:#ff3048;--red2:#a80d25;--text:#f5f3f4;--muted:#aaa1a7;--green:#6ee7a0}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at top right,#260a13,transparent 40%),var(--bg);color:var(--text);font:15px/1.5 system-ui,sans-serif;min-height:100vh}
-button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
-.hidden{display:none!important}
-.app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}
-.sidebar{border-right:1px solid var(--line);background:#0c0b10;padding:20px 14px;display:flex;flex-direction:column;gap:20px}
-.brand{display:flex;align-items:center;gap:11px;padding:5px 7px}
-.logo{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,var(--red),#700819);font-weight:900;box-shadow:0 0 24px #ff304833}
-.brand strong{font-size:18px;letter-spacing:2px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px}
-.nav{display:grid;gap:6px}.nav button,.logout{border:1px solid transparent;background:transparent;color:#c9c0c5;text-align:left;padding:11px;border-radius:10px}
-.nav button.active,.nav button:hover{background:#291019;border-color:#57202d;color:white}
-.sidebottom{margin-top:auto;display:grid;gap:10px}.userbox,.card{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:17px}
-.userbox{overflow-wrap:anywhere}.userbox small,.muted,.smallmuted{color:var(--muted)}
-.main{min-width:0;padding:23px clamp(14px,4vw,40px);max-width:1300px;width:100%;margin:auto}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
-.eyebrow{color:var(--red);text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}
-.topbar h1{font-size:clamp(23px,3vw,31px);margin:4px 0}.status{font-size:12px;color:var(--muted)}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:5px}
-.hero{padding:clamp(20px,4vw,34px);background:linear-gradient(110deg,#291018,#111116)}
-.hero h2{font-size:clamp(25px,4vw,39px);line-height:1.15;margin:10px 0}
-.btn{border:1px solid #5d2632;background:#291019;color:white;border-radius:10px;padding:10px 14px;font-weight:650}
-.btn.primary{background:linear-gradient(135deg,var(--red),var(--red2));border-color:var(--red)}
-.btn.danger{background:#2a0d15;border-color:#6b2533;color:#ffb8c1}
-.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;color:var(--text);text-align:left;min-height:120px}
-.tile strong,.tile small{display:block}.tile small{color:var(--muted);margin-top:5px}
-.sectiontitle{margin:25px 0 12px;font-size:18px}.page{min-width:0}
-.field{width:100%;padding:11px;border:1px solid #393039;border-radius:10px;background:#0b0a0f;color:white}
-.field:focus{border-color:var(--red);outline:none}textarea.field{resize:vertical}
-.formrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.formrow .field{flex:1;min-width:150px}
-.chatbox{height:min(55vh,520px);min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:5px 2px 15px}
-.msg{max-width:95%;overflow-wrap:anywhere;padding:12px 14px;border-radius:13px}
-.msg.user{align-self:flex-end;background:#4a1422;border:1px solid #752338;white-space:pre-wrap}
-.msg.bot{align-self:flex-start;background:#19181f;border:1px solid #302a31}
-.chatinput{display:flex;gap:8px;align-items:flex-end}.chatinput textarea{flex:1;min-width:0;background:#0b0a0f;color:white;border:1px solid #393039;border-radius:12px;padding:12px}
-.memorylist{display:grid;gap:9px}.memoryitem{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:12px;border:1px solid var(--line);border-radius:10px;background:#111015;overflow-wrap:anywhere}
-.memoryitem>span{flex:1;min-width:0;white-space:pre-wrap}.error{color:#ff9ca8;font-size:13px;white-space:pre-wrap}
-.loginwrap{min-height:100vh;display:grid;place-items:center;padding:20px}
-.login{max-width:460px;width:100%;padding:28px;border:1px solid #47212a;border-radius:20px;background:#111015}
-.login h1{font-size:32px;margin:8px 0}.login p{color:var(--muted)}
-.smallmuted{font-size:12px}.codeoutput{background:#08080c;border:1px solid #35262e;border-radius:12px;overflow:hidden}
-.codehead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px;background:#171118}
-.codeoutput pre{margin:0;padding:14px;max-height:50vh;overflow:auto;white-space:pre;color:#f5dce1;font:13px/1.5 monospace}
-#editor{min-height:300px;font-family:monospace;white-space:pre;overflow:auto}
-.filebuttons{display:flex;gap:6px;flex-wrap:wrap}.footer{color:#6e666b;font-size:11px;margin-top:24px}.hamb{display:none}
-.msg.bot p{margin:4px 0 10px}.msg.bot pre{white-space:pre;overflow:auto;background:#08080c;padding:12px;border-radius:8px;border:1px solid var(--line)}
-.msg.bot code{font-family:monospace;background:#09090d;padding:2px 5px;border-radius:4px}
-.msg.bot pre code{background:transparent;padding:0}.msg.bot ul,.msg.bot ol{padding-left:23px}
-.msg.bot a{color:#ff8292}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#260a13,transparent 40%),var(--bg);color:var(--text);font:15px/1.5 system-ui,sans-serif;min-height:100vh}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}.app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{border-right:1px solid var(--line);background:#0c0b10;padding:20px 14px;display:flex;flex-direction:column;gap:20px}.brand{display:flex;align-items:center;gap:11px;padding:5px 7px}.logo{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,var(--red),#700819);font-weight:900;box-shadow:0 0 24px #ff304833}.brand strong{font-size:18px;letter-spacing:2px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px}.nav{display:grid;gap:6px}.nav button,.logout{border:1px solid transparent;background:transparent;color:#c9c0c5;text-align:left;padding:11px;border-radius:10px}.nav button.active,.nav button:hover{background:#291019;border-color:#57202d;color:white}.sidebottom{margin-top:auto;display:grid;gap:10px}.userbox,.card{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:17px}.userbox{overflow-wrap:anywhere}.userbox small,.muted,.smallmuted{color:var(--muted)}.main{min-width:0;padding:23px clamp(14px,4vw,40px);max-width:1300px;width:100%;margin:auto}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}.eyebrow{color:var(--red);text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}.topbar h1{font-size:clamp(23px,3vw,31px);margin:4px 0}.status{font-size:12px;color:var(--muted)}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:5px}.hero{padding:clamp(20px,4vw,34px);background:linear-gradient(110deg,#291018,#111116)}.hero h2{font-size:clamp(25px,4vw,39px);line-height:1.15;margin:10px 0}.btn{border:1px solid #5d2632;background:#291019;color:white;border-radius:10px;padding:10px 14px;font-weight:650}.btn.primary{background:linear-gradient(135deg,var(--red),var(--red2));border-color:var(--red)}.btn.danger{background:#2a0d15;border-color:#6b2533;color:#ffb8c1}.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;color:var(--text);text-align:left;min-height:120px}.tile strong,.tile small{display:block}.tile small{color:var(--muted);margin-top:5px}.sectiontitle{margin:25px 0 12px;font-size:18px}.page{min-width:0}.field{width:100%;padding:11px;border:1px solid #393039;border-radius:10px;background:#0b0a0f;color:white}.field:focus{border-color:var(--red);outline:none}textarea.field{resize:vertical}.formrow{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.formrow .field{flex:1;min-width:150px}.chatbox{height:min(55vh,520px);min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:5px 2px 15px}.msg{max-width:90%;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px 14px;border-radius:13px}.msg.user{align-self:flex-end;background:#4a1422;border:1px solid #752338}.msg.bot{align-self:flex-start;background:#19181f;border:1px solid #302a31}.chatinput{display:flex;gap:8px;align-items:flex-end}.chatinput textarea{flex:1;min-width:0;background:#0b0a0f;color:white;border:1px solid #393039;border-radius:12px;padding:12px}.memorylist{display:grid;gap:9px}.memoryitem{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:12px;border:1px solid var(--line);border-radius:10px;background:#111015;overflow-wrap:anywhere}.memoryitem>span{flex:1;min-width:0;white-space:pre-wrap}.error{color:#ff9ca8;font-size:13px;white-space:pre-wrap}.loginwrap{min-height:100vh;display:grid;place-items:center;padding:20px}.login{max-width:460px;width:100%;padding:28px;border:1px solid #47212a;border-radius:20px;background:#111015}.login h1{font-size:32px;margin:8px 0}.login p{color:var(--muted)}.smallmuted{font-size:12px}.codeoutput{background:#08080c;border:1px solid #35262e;border-radius:12px;overflow:hidden}.codehead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px;background:#171118}.codeoutput pre{margin:0;padding:14px;max-height:50vh;overflow:auto;white-space:pre;color:#f5dce1;font:13px/1.5 monospace}.msg.bot p{margin:4px 0 10px}.msg.bot pre{white-space:pre;overflow:auto;background:#08080c;padding:12px;border-radius:8px;border:1px solid var(--line)}.msg.bot code{font-family:monospace;background:#09090d;padding:2px 5px;border-radius:4px}.msg.bot pre code{background:transparent;padding:0}.msg.bot ul,.msg.bot ol{padding-left:23px}.msg.bot a{color:#ff8292}#editor{min-height:300px;font-family:monospace;white-space:pre;overflow:auto}.filebuttons{display:flex;gap:6px;flex-wrap:wrap}.footer{color:#6e666b;font-size:11px;margin-top:24px}.hamb{display:none}hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 @media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{display:none;position:fixed;z-index:10;inset:0 auto 0 0;width:min(285px,85vw);box-shadow:15px 0 50px #0009}.sidebar.open{display:flex}.hamb{display:inline-block}.main{padding:17px 12px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:460px){.grid{grid-template-columns:1fr}.card{padding:14px}.topbar{align-items:flex-start}.chatinput .btn{padding:10px}}
 </style>
 </head>
 <body>
-<div id="loginScreen" class="loginwrap">
-<section class="login">
-<div class="brand"><div class="logo">U</div><div><strong>ULTRON</strong><small>PERSONAL AI SYSTEM · V4</small></div></div>
+<div id="loginScreen" class="loginwrap"><section class="login">
+<div class="brand"><div class="logo">U</div><div><strong>ULTRON</strong><small>PERSONAL AI SYSTEM</small></div></div>
 <div class="eyebrow" style="margin-top:25px">Acesso seguro</div><h1>Bem-vindo.</h1>
 <p>Entre para acessar seu painel, conversar com o ULTRON e consultar seus projetos e sua memória.</p>
 <button id="loginBtn" class="btn primary" style="width:100%">Entrar com Google</button>
-<p id="loginStatus" class="error"></p><p class="smallmuted">A chave do Gemini permanece no servidor Vercel.</p>
+<p id="loginStatus" class="error" aria-live="polite"></p><p class="smallmuted">A chave do Gemini fica no servidor Vercel.</p>
 </section></div>
-
 <div id="app" class="app hidden">
-<aside id="sidebar" class="sidebar">
-<div class="brand"><div class="logo">U</div><div><strong>ULTRON</strong><small>PERSONAL AI · V4</small></div></div>
+<aside id="sidebar" class="sidebar"><div class="brand"><div class="logo">U</div><div><strong>ULTRON</strong><small>PERSONAL AI SYSTEM</small></div></div>
 <nav id="nav" class="nav">
-<button class="active" data-page="home">⌂ Início</button><button data-page="chat">◉ Chat</button>
-<button data-page="code">⌘ Criar códigos</button><button data-page="projects">▣ Projetos</button>
-<button data-page="injector">⟁ Injetor de arquivos</button><button data-page="memory">◈ Memória</button>
-<button data-page="settings">⚙ Configurações</button>
-</nav>
-<div class="sidebottom"><div class="userbox"><small>Conta conectada</small><div id="userEmail">Carregando…</div></div><button id="logoutBtn" class="logout">↪ Sair da conta</button></div>
-</aside>
-
-<main class="main">
-<header class="topbar"><div><button id="menuBtn" class="btn hamb">☰</button><div class="eyebrow">Sistema pessoal</div><h1 id="pageTitle">Painel de controle</h1></div><div class="status"><span class="dot"></span><span id="statusText">Conectando…</span></div></header>
-
-<section id="page-home" class="page">
-<div class="card hero"><div class="eyebrow">Interface operacional</div><h2>Como posso ajudar hoje?</h2><p class="muted">Converse com o ULTRON, crie código, edite arquivos e organize seus projetos.</p><button class="btn primary" data-goto="chat">Abrir chat →</button></div>
-<h2 class="sectiontitle">Módulos</h2><div class="grid">
-<button class="tile" data-goto="chat"><strong>◉ Chat ULTRON</strong><small>Converse com o Gemini.</small></button>
-<button class="tile" data-goto="code"><strong>⌘ Criar códigos</strong><small>Gere e baixe código.</small></button>
-<button class="tile" data-goto="projects"><strong>▣ Projetos</strong><small>Salve e organize projetos.</small></button>
-<button class="tile" data-goto="injector"><strong>⟁ Injetor</strong><small>Importe, edite e exporte arquivos.</small></button>
-<button class="tile" data-goto="memory"><strong>◈ Memória</strong><small>Gerencie informações salvas.</small></button>
-<button class="tile" data-goto="settings"><strong>⚙ Configurações</strong><small>Personalidade e conta.</small></button>
-</div><div class="footer">ULTRON V4 · Revise os arquivos antes de executá-los.</div>
-</section>
-
-<section id="page-chat" class="page hidden"><div class="card">
-<div id="chatbox" class="chatbox"><div class="msg bot">ULTRON online. Como posso ajudar?</div></div>
-<div class="chatinput"><textarea id="messageInput" rows="2" placeholder="Escreva uma mensagem…"></textarea><button id="sendBtn" class="btn primary">Enviar</button></div>
-<p class="smallmuted">Use “Lembre que …” para salvar uma informação na memória.</p>
-</div></section>
-
-<section id="page-code" class="page hidden"><div class="card">
-<div class="eyebrow">Desenvolvimento</div><h2>Criar códigos</h2><p class="muted">Descreva o que deseja construir.</p>
-<textarea id="codePrompt" class="field" rows="5" placeholder="Ex.: Crie uma página HTML responsiva para uma lista de tarefas."></textarea>
-<div class="formrow" style="margin-top:10px"><select id="codeLanguage" class="field">
-<option>HTML completo</option><option>JavaScript</option><option>Python</option><option>CSS</option><option>TypeScript</option><option>React JSX</option><option>JSON</option><option>SQL</option><option>outra linguagem adequada ao pedido</option>
-</select><input id="codeFilename" class="field" value="index.html" placeholder="Nome do arquivo"></div>
-<div class="btnrow"><button id="codeGenerate" class="btn primary">Gerar código</button><button id="codeClear" class="btn">Limpar</button></div><p id="codeStatus" class="smallmuted"></p>
-</div>
-<div id="codeResultCard" class="card hidden"><h3 id="codeResultTitle">Código gerado</h3>
-<div class="codeoutput"><div class="codehead"><span id="codeFileLabel">index.html</span><div class="filebuttons"><button id="copyCode" class="btn">Copiar</button><button id="downloadCode" class="btn primary">Baixar</button></div></div><pre><code id="codeOutput"></code></pre></div>
-<div class="btnrow"><button id="saveCodeProject" class="btn">Salvar como projeto</button><button id="sendCodeToInjector" class="btn primary">Abrir no Injetor</button></div>
-<p id="codeActionStatus" class="smallmuted"></p>
-</div></section>
-
-<section id="page-projects" class="page hidden"><div class="card">
-<div class="eyebrow">Organização</div><h2>Meus projetos</h2><p class="muted">Os projetos são guardados no navegador e sincronizados com o Firestore quando as regras permitem.</p>
-<div class="formrow"><input id="projectName" class="field" placeholder="Nome do projeto"><button id="addProject" class="btn primary">Adicionar</button></div>
-<p id="projectStatus" class="smallmuted"></p><div id="projectList" class="memorylist"></div>
-</div></section>
-
-<section id="page-injector" class="page hidden"><div class="card">
-<div class="eyebrow">Editor local</div><h2>Injetor de arquivos</h2>
-<p class="muted">Importe arquivos de texto ou código, edite e baixe a versão modificada. Não injeta código em outros aplicativos nem executa arquivos automaticamente.</p>
-<input id="filePicker" type="file" multiple class="field">
-<div class="btnrow"><button id="downloadAll" class="btn">Baixar todos</button><button id="clearFiles" class="btn danger">Limpar lista</button></div>
-<p id="injectorStatus" class="smallmuted" aria-live="polite"></p><div id="fileList" class="memorylist"></div>
-</div>
-<div id="editorCard" class="card hidden"><div class="eyebrow">Arquivo selecionado</div><h3 id="editorFilename">Arquivo</h3>
-<textarea id="editor" class="field" spellcheck="false"></textarea>
-<div class="btnrow"><button id="applyFile" class="btn primary">Aplicar edição</button><button id="downloadFile" class="btn">Baixar arquivo</button><button id="closeEditor" class="btn">Fechar editor</button></div>
-<p id="editorStatus" class="smallmuted"></p></div>
-</section>
-
-<section id="page-memory" class="page hidden"><div class="card">
-<div class="eyebrow">Contexto pessoal</div><h2>Memória do ULTRON</h2><p class="muted">A memória é salva na sua conta do Firestore.</p>
-<div class="formrow"><input id="memoryInput" class="field" placeholder="Informação para guardar"><button id="saveMemory" class="btn primary">Guardar</button></div>
-<div id="memoryList" class="memorylist" style="margin-top:14px"></div>
-</div></section>
-
-<section id="page-settings" class="page hidden"><div class="card">
-<div class="eyebrow">Personalização</div><h2>Configurações do ULTRON</h2>
-<p class="muted">Escolha como o ULTRON deve formular as respostas. A preferência é salva neste navegador.</p>
-<label for="personality" class="smallmuted">Estilo de resposta</label>
-<select id="personality" class="field" style="margin:6px 0 14px">
-<option value="direto">Direto e conciso</option><option value="detalhado">Detalhado e explicativo</option><option value="tecnico">Técnico e focado em programação</option><option value="jarvis">Assistente estilo JARVIS: formal e objetivo</option>
-</select>
-<label for="customInstructions" class="smallmuted">Instruções personalizadas</label>
-<textarea id="customInstructions" class="field" rows="3" placeholder="Ex.: explique passo a passo e use exemplos."></textarea>
-<div class="btnrow"><button id="savePreferences" class="btn primary">Salvar preferências</button></div><p id="preferencesStatus" class="smallmuted"></p>
-<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
-<p class="muted">Conta conectada:</p><div id="settingsEmail"></div>
-<p class="muted" style="margin-top:18px">Estado das integrações</p><div id="integrationStatus">Firebase: verificando…</div>
-<button id="settingsLogout" class="btn danger" style="margin-top:18px">Sair da conta</button>
-</div></section>
+<button class="active" data-page="home">⌂ Início</button><button data-page="chat">◉ Chat</button><button data-page="code">⌘ Criar códigos</button><button data-page="projects">▣ Projetos</button><button data-page="injector">⟁ Editor de arquivos</button><button data-page="memory">◈ Memória</button><button data-page="settings">⚙ Configurações</button>
+</nav><div class="sidebottom"><div class="userbox"><small>Conta conectada</small><div id="userEmail">Carregando…</div></div><button id="logoutBtn" class="logout">↪ Sair da conta</button></div></aside>
+<main class="main"><header class="topbar"><div><button id="menuBtn" class="btn hamb" type="button">☰</button><div class="eyebrow">Sistema pessoal</div><h1 id="pageTitle">Painel de controle</h1></div><div class="status"><span class="dot"></span><span id="statusText">Conectando…</span></div></header>
+<section id="page-home" class="page"><div class="card hero"><div class="eyebrow">Interface operacional</div><h2>Como posso ajudar hoje?</h2><p class="muted">Converse com o ULTRON, gere código, edite arquivos e organize seus projetos.</p><button class="btn primary" data-goto="chat">Abrir chat →</button></div><h2 class="sectiontitle">Módulos</h2><div class="grid">
+<button class="tile" data-goto="chat"><strong>◉ Chat ULTRON</strong><small>Converse com o Gemini.</small></button><button class="tile" data-goto="code"><strong>⌘ Criar códigos</strong><small>Gere e baixe código.</small></button><button class="tile" data-goto="projects"><strong>▣ Projetos</strong><small>Salve e organize seus projetos.</small></button><button class="tile" data-goto="injector"><strong>⟁ Editor de arquivos</strong><small>Importe, edite e exporte arquivos.</small></button><button class="tile" data-goto="memory"><strong>◈ Memória</strong><small>Gerencie informações salvas.</small></button><button class="tile" data-goto="settings"><strong>⚙ Configurações</strong><small>Personalidade e conta.</small></button></div><div class="footer">ULTRON · Confira os arquivos antes de executá-los.</div></section>
+<section id="page-chat" class="page hidden"><div class="card"><div id="chatbox" class="chatbox"><div class="msg bot">ULTRON online. Como posso ajudar?</div></div><div class="chatinput"><textarea id="messageInput" rows="2" placeholder="Escreva uma mensagem…"></textarea><button id="sendBtn" class="btn primary">Enviar</button></div><p class="smallmuted">Use “Lembre que …” para salvar uma informação na memória.</p></div></section>
+<section id="page-code" class="page hidden"><div class="card"><div class="eyebrow">Desenvolvimento</div><h2>Criar códigos</h2><p class="muted">Descreva o que deseja construir.</p><textarea id="codePrompt" class="field" rows="5" placeholder="Ex.: Crie uma página HTML responsiva para uma lista de tarefas."></textarea><div class="formrow" style="margin-top:10px"><select id="codeLanguage" class="field"><option>HTML completo</option><option>JavaScript</option><option>Python</option><option>CSS</option><option>TypeScript</option><option>React JSX</option><option>JSON</option><option>SQL</option><option>outra linguagem adequada ao pedido</option></select><input id="codeFilename" class="field" value="index.html" placeholder="Nome do arquivo"></div><div class="btnrow"><button id="codeGenerate" class="btn primary">Gerar código</button><button id="codeClear" class="btn">Limpar</button></div><p id="codeStatus" class="smallmuted" aria-live="polite"></p></div>
+<div id="codeResultCard" class="card hidden"><h3 id="codeResultTitle">Código gerado</h3><div class="codeoutput"><div class="codehead"><span id="codeFileLabel">index.html</span><div class="filebuttons"><button id="copyCode" class="btn">Copiar</button><button id="downloadCode" class="btn primary">Baixar</button></div></div><pre><code id="codeOutput"></code></pre></div><div class="btnrow"><button id="saveCodeProject" class="btn">Salvar como projeto</button><button id="sendCodeToInjector" class="btn primary">Abrir no editor</button></div><p id="codeActionStatus" class="smallmuted"></p></div></section>
+<section id="page-projects" class="page hidden"><div class="card"><div class="eyebrow">Organização</div><h2>Meus projetos</h2><p class="muted">Os projetos ficam neste navegador e, quando as regras do Firestore permitem, sincronizam com sua conta.</p><div class="formrow"><input id="projectName" class="field" placeholder="Nome do projeto"><button id="addProject" class="btn primary">Adicionar</button></div><p id="projectStatus" class="smallmuted"></p><div id="projectList" class="memorylist"></div></div></section>
+<section id="page-injector" class="page hidden"><div class="card"><div class="eyebrow">Editor local</div><h2>Editor de arquivos</h2><p class="muted">Importe arquivos de texto ou código, edite e baixe a versão modificada. Não injeta código em outros aplicativos nem executa arquivos automaticamente.</p><input id="filePicker" type="file" multiple class="field"><div class="btnrow"><button id="downloadAll" class="btn">Baixar todos</button><button id="clearFiles" class="btn danger">Limpar lista</button></div><p id="injectorStatus" class="smallmuted" aria-live="polite"></p><div id="fileList" class="memorylist"></div></div><div id="editorCard" class="card hidden"><div class="eyebrow">Arquivo selecionado</div><h3 id="editorFilename">Arquivo</h3><textarea id="editor" class="field" spellcheck="false"></textarea><div class="btnrow"><button id="applyFile" class="btn primary">Aplicar edição</button><button id="downloadFile" class="btn">Baixar arquivo</button><button id="closeEditor" class="btn">Fechar editor</button></div><p id="editorStatus" class="smallmuted"></p></div></section>
+<section id="page-memory" class="page hidden"><div class="card"><div class="eyebrow">Contexto pessoal</div><h2>Memória do ULTRON</h2><p class="muted">A memória é salva na sua conta do Firestore, quando a conexão permite.</p><div class="formrow"><input id="memoryInput" class="field" placeholder="Informação para guardar"><button id="saveMemory" class="btn primary">Guardar</button></div><div id="memoryList" class="memorylist" style="margin-top:14px"></div><p id="memoryStatus" class="smallmuted"></p></div></section>
+<section id="page-settings" class="page hidden"><div class="card"><div class="eyebrow">Personalização</div><h2>Configurações do ULTRON</h2><p class="muted">Escolha como o ULTRON deve formular as respostas. As preferências ficam salvas neste navegador.</p><label for="personality" class="smallmuted">Estilo de resposta</label><select id="personality" class="field" style="margin:6px 0 14px"><option value="direto">Direto e conciso</option><option value="detalhado">Detalhado e explicativo</option><option value="tecnico">Técnico e focado em programação</option><option value="jarvis">Assistente estilo JARVIS: formal e objetivo</option></select><label for="customInstructions" class="smallmuted">Instruções personalizadas</label><textarea id="customInstructions" class="field" rows="3" placeholder="Ex.: explique passo a passo e use exemplos."></textarea><div class="btnrow"><button id="savePreferences" class="btn primary">Salvar preferências</button></div><p id="preferencesStatus" class="smallmuted"></p><hr><p class="muted">Conta conectada:</p><div id="settingsEmail"></div><p class="muted" style="margin-top:18px">Estado das integrações</p><div id="integrationStatus">Firebase: verificando…</div><button id="settingsLogout" class="btn danger" style="margin-top:18px">Sair da conta</button></div></section>
 </main></div>
-
 <script type="module">
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
-import {getAuth,GoogleAuthProvider,signInWithPopup,getRedirectResult,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
-import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
-const firebaseConfig={
-apiKey:'AIzaSyCzmyFYp1DfBL71oNvrSzssSxYqPxcP_14',
-authDomain:'ultron-6a27a.firebaseapp.com',projectId:'ultron-6a27a',
-storageBucket:'ultron-6a27a.firebasestorage.app',
-messagingSenderId:'825972778459',appId:'1:825972778459:web:1cb1b29fb6fd702843f3fe'
+const firebaseConfig = {
+  apiKey: 'AIzaSyCzmyFYp1DfBL71oNvrSzssSxYqPxcP_14',
+  authDomain: 'ultron-6a27a.firebaseapp.com',
+  projectId: 'ultron-6a27a',
+  storageBucket: 'ultron-6a27a.firebasestorage.app',
+  messagingSenderId: '825972778459',
+  appId: '1:825972778459:web:1cb1b29fb6fd702843f3fe'
 };
-const $=id=>document.getElementById(id);
-let auth,db,currentUser=null,memories=[],history=[],busy=false,generatedCode='';
-let projects=[],files=[],activeFileId=null;
-const projectStorageKey='ultron_v3_projects';
-const fileLimit=2*1024*1024;
-const preferenceKey='ultron_v4_preferences';
 
-function safeString(value,max=1000){return typeof value==='string'?value.trim().slice(0,max):''}
-function setStatus(text){$('statusText').textContent=text}
-function showLoginError(text){$('loginStatus').textContent=text||''}
-function newId(){return globalThis.crypto?.randomUUID?.()||String(Date.now())+'-'+Math.random().toString(36).slice(2)}
-function showPage(name){
-document.querySelectorAll('.page').forEach(el=>el.classList.add('hidden'));
-$('page-'+name)?.classList.remove('hidden');
-document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
-const titles={home:'Painel de controle',chat:'Chat ULTRON',code:'Criar códigos',projects:'Projetos',injector:'Injetor',memory:'Memória',settings:'Configurações'};
-$('pageTitle').textContent=titles[name]||'ULTRON';$('sidebar').classList.remove('open');
-if(name==='chat')$('messageInput').focus();
-}
-function conversationRef(){return doc(db,'users',currentUser.uid,'conversations','main')}
-function memoryRef(){return doc(db,'users',currentUser.uid,'memories','main')}
-function projectsRef(){return doc(db,'users',currentUser.uid,'projects','main')}
+const $ = id => document.getElementById(id);
+let auth, db, currentUser = null, memories = [], history = [], busy = false, generatedCode = '';
+let projects = [], files = [], activeFileId = null;
+const projectStorageKey = 'ultron_v3_projects';
+const preferenceKey = 'ultron_v4_preferences';
+const fileLimit = 2 * 1024 * 1024;
+const titles = {home:'Painel de controle',chat:'Chat ULTRON',code:'Criar códigos',projects:'Projetos',injector:'Editor de arquivos',memory:'Memória',settings:'Configurações'};
 
-/* Markdown seguro: constrói elementos DOM; nunca interpreta HTML da resposta. */
-function renderMarkdown(container,text){
-container.replaceChildren();
-const lines=String(text||'').replace(/\r/g,'').split('\n');
-let i=0,paragraph=[],list=null,codeLines=[],inCode=false,codeLang='';
-function inline(parent,s){
-const re=/(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g;
-let pos=0,m;
-while((m=re.exec(s))){
-if(m.index>pos)parent.append(document.createTextNode(s.slice(pos,m.index)));
-const token=m[0];let el;
-if(token.startsWith('**')){el=document.createElement('strong');el.textContent=token.slice(2,-2)}
-else if(token.startsWith('`')){el=document.createElement('code');el.textContent=token.slice(1,-1)}
-else if(token.startsWith('*')){el=document.createElement('em');el.textContent=token.slice(1,-1)}
-else{const parts=token.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);el=document.createElement('a');el.textContent=parts[1];el.href=parts[2];el.target='_blank';el.rel='noopener noreferrer'}
-parent.append(el);pos=re.lastIndex;
-}
-if(pos<s.length)parent.append(document.createTextNode(s.slice(pos)));
-}
-function flushParagraph(){if(!paragraph.length)return;const p=document.createElement('p');inline(p,paragraph.join('\n'));container.append(p);paragraph=[]}
-function flushList(){if(!list)return;container.append(list);list=null}
-while(i<lines.length){
-const line=lines[i];
-if(line.trim().startsWith('```')){
-if(!inCode){flushParagraph();flushList();inCode=true;codeLang=line.trim().slice(3).slice(0,30);codeLines=[]}
-else{const pre=document.createElement('pre'),code=document.createElement('code');code.textContent=codeLines.join('\n');if(codeLang)code.dataset.language=codeLang;pre.append(code);container.append(pre);inCode=false;codeLang=''}
-i++;continue;
-}
-if(inCode){codeLines.push(line);i++;continue}
-if(!line.trim()){flushParagraph();flushList();i++;continue}
-const heading=line.match(/^(#{1,3})\s+(.+)$/);
-if(heading){flushParagraph();flushList();const h=document.createElement('h'+heading[1].length);inline(h,heading[2]);container.append(h);i++;continue}
-const li=line.match(/^\s*[-*]\s+(.+)$/);
-const oi=line.match(/^\s*\d+[.)]\s+(.+)$/);
-if(li||oi){flushParagraph();const tag=li?'ul':'ol';if(!list||list.tagName.toLowerCase()!==tag){flushList();list=document.createElement(tag)}const item=document.createElement('li');inline(item,(li||oi)[1]);list.append(item);i++;continue}
-flushList();paragraph.push(line);i++;
-}
-if(inCode){const pre=document.createElement('pre'),code=document.createElement('code');code.textContent=codeLines.join('\n');pre.append(code);container.append(pre)}
-flushParagraph();flushList();
-}
-function addMessage(text,who='bot',save=true){
-const box=$('chatbox'),el=document.createElement('div');el.className='msg '+(who==='user'?'user':'bot');
-if(who==='user')el.textContent=text;else renderMarkdown(el,text);
-box.append(el);box.scrollTop=box.scrollHeight;
-if(save){history.push({role:who==='user'?'user':'model',parts:[{text}]});history=history.slice(-40)}
-}
-async function loadUserData(){
-try{
-const [convSnap,memSnap]=await Promise.all([getDoc(conversationRef()),getDoc(memoryRef())]);
-if(convSnap.exists()&&Array.isArray(convSnap.data().messages)){
-history=convSnap.data().messages.filter(m=>m&&['user','model'].includes(m.role)&&Array.isArray(m.parts)).slice(-40);
-const box=$('chatbox');box.replaceChildren();
-history.forEach(m=>{const el=document.createElement('div');el.className='msg '+(m.role==='user'?'user':'bot');const text=(m.parts||[]).map(p=>p.text||'').join('');if(m.role==='user')el.textContent=text;else renderMarkdown(el,text);box.append(el)});
-if(!history.length)addMessage('ULTRON online. Como posso ajudar?', 'bot', false);
+function setStatus(text) { $('statusText').textContent = text; }
+function showLoginError(text) { $('loginStatus').textContent = text || ''; }
+function conversationRef() { return doc(db,'users',currentUser.uid,'conversations','main'); }
+function memoryRef() { return doc(db,'users',currentUser.uid,'memories','main'); }
+function projectsRef() { return doc(db,'users',currentUser.uid,'projects','main'); }
+function localRead(key, fallback) { try { const value = localStorage.getItem(key); return value ? JSON.parse(value) : fallback; } catch { return fallback; } }
+function localWrite(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (error) { console.warn('Não foi possível salvar no navegador:', error); } }
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+  $('page-' + name)?.classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach(button => button.classList.toggle('active', button.dataset.page === name));
+  $('pageTitle').textContent = titles[name] || 'ULTRON';
+  $('sidebar').classList.remove('open');
+  if (name === 'chat') $('messageInput').focus();
 }
 
-async function saveHistory() {
-  try {
-    await setDoc(conversationRef(), {
-      messages: history.slice(-40),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-  } catch (e) {
-    console.error('Erro ao salvar conversa:', e);
+// Renderização básica de Markdown usando nós DOM para não executar HTML recebido da IA.
+function renderMarkdown(container, text) {
+  container.replaceChildren();
+  const lines = String(text || '').replace(/\r/g, '').split('\n');
+  let paragraph = [], list = null, inCode = false, codeLines = [];
+  function inline(parent, str) {
+    const regex = /(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*)/g;
+    let pos = 0, match;
+    while ((match = regex.exec(str))) {
+      if (match.index > pos) parent.append(document.createTextNode(str.slice(pos, match.index)));
+      const token = match[0]; const el = document.createElement(token.startsWith('**') ? 'strong' : token.startsWith('`') ? 'code' : 'em');
+      el.textContent = token.startsWith('**') ? token.slice(2,-2) : token.startsWith('`') ? token.slice(1,-1) : token.slice(1,-1);
+      parent.append(el); pos = regex.lastIndex;
+    }
+    if (pos < str.length) parent.append(document.createTextNode(str.slice(pos)));
   }
+  function flushParagraph() { if (!paragraph.length) return; const p = document.createElement('p'); inline(p, paragraph.join('\n')); container.append(p); paragraph = []; }
+  function flushList() { if (list) { container.append(list); list = null; } }
+  for (const line of lines) {
+    if (line.trim().startsWith('```')) {
+      if (!inCode) { flushParagraph(); flushList(); inCode = true; codeLines = []; }
+      else { const pre = document.createElement('pre'); const code = document.createElement('code'); code.textContent = codeLines.join('\n'); pre.append(code); container.append(pre); inCode = false; }
+      continue;
+    }
+    if (inCode) { codeLines.push(line); continue; }
+    if (!line.trim()) { flushParagraph(); flushList(); continue; }
+    const heading = line.match(/^(#{1,3})\s+(.+)$/);
+    if (heading) { flushParagraph(); flushList(); const h = document.createElement('h' + heading[1].length); inline(h, heading[2]); container.append(h); continue; }
+    const item = line.match(/^\s*[-*]\s+(.+)$/);
+    const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+    if (item || ordered) { flushParagraph(); const tag = item ? 'ul' : 'ol'; if (!list || list.tagName.toLowerCase() !== tag) { flushList(); list = document.createElement(tag); } const li = document.createElement('li'); inline(li, (item || ordered)[1]); list.append(li); continue; }
+    flushList(); paragraph.push(line);
+  }
+  if (inCode) { const pre = document.createElement('pre'); const code = document.createElement('code'); code.textContent = codeLines.join('\n'); pre.append(code); container.append(pre); }
+  flushParagraph(); flushList();
 }
 
-async function saveMemories() {
-  try {
-    await setDoc(memoryRef(), {
-      items: memories.slice(0, 30),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-    renderMemories();
-  } catch (e) {
-    console.error('Erro ao salvar memória:', e);
-  }
+function addMessage(text, who = 'bot', save = true) {
+  const box = $('chatbox'); const element = document.createElement('div');
+  element.className = 'msg ' + (who === 'user' ? 'user' : 'bot');
+  if (who === 'user') element.textContent = String(text); else renderMarkdown(element, text);
+  box.append(element); box.scrollTop = box.scrollHeight;
+  if (save) { history.push({role: who === 'user' ? 'user' : 'model', parts:[{text:String(text)}]}); history = history.slice(-40); }
 }
-
-function renderMemories() {
-  const box = $('memoryList');
-  box.innerHTML = '';
-
-  if (!memories.length) {
-    box.textContent = 'Nenhuma memória salva.';
-    return;
-  }
-
-  memories.forEach((item, index) => {
-    const row = document.createElement('div');
-    row.className = 'memoryitem';
-
-    const text = document.createElement('span');
-    text.textContent = item;
-
-    const button = document.createElement('button');
-    button.className = 'btn danger';
-    button.textContent = 'Apagar';
-
-    button.onclick = async () => {
-      memories.splice(index, 1);
-      await saveMemories();
-    };
-
-    row.append(text, button);
-    box.appendChild(row);
+function renderHistory() {
+  const box = $('chatbox'); box.replaceChildren();
+  history.forEach(item => {
+    if (!item || !['user','model'].includes(item.role)) return;
+    const text = Array.isArray(item.parts) ? item.parts.map(part => part?.text || '').join('') : (typeof item.text === 'string' ? item.text : '');
+    const element = document.createElement('div'); element.className = 'msg ' + (item.role === 'user' ? 'user' : 'bot');
+    if (item.role === 'user') element.textContent = text; else renderMarkdown(element, text);
+    box.append(element);
   });
+  if (!box.childElementCount) { const element = document.createElement('div'); element.className = 'msg bot'; element.textContent = 'ULTRON online. Como posso ajudar?'; box.append(element); }
+  box.scrollTop = box.scrollHeight;
+}
+
+function getPreferences() {
+  const pref = localRead(preferenceKey, {});
+  $('personality').value = pref.personality || 'direto';
+  $('customInstructions').value = pref.customInstructions || '';
+}
+function savePreferences() {
+  localWrite(preferenceKey, {personality:$('personality').value, customInstructions:$('customInstructions').value.trim().slice(0,800)});
+  $('preferencesStatus').textContent = 'Preferências salvas neste dispositivo.';
+}
+function buildPrompt(message) {
+  const pref = localRead(preferenceKey, {}); const styles = {
+    direto:'Responda de forma direta e concisa, sem omitir informação importante.',
+    detalhado:'Explique com detalhes e organize a resposta em passos quando for útil.',
+    tecnico:'Priorize precisão técnica, programação e exemplos que possam ser testados.',
+    jarvis:'Use um tom formal, objetivo e organizado, inspirado em um assistente tecnológico.'
+  };
+  let prefix = 'Preferência de resposta: ' + (styles[pref.personality] || styles.direto);
+  if (pref.customInstructions) prefix += '\nInstruções adicionais do usuário: ' + pref.customInstructions;
+  return '[' + prefix + ']\n\n' + message;
 }
 
 async function callChatAPI(message, historyForRequest = []) {
-  const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message,
-      history: historyForRequest,
-      memories
-    })
-  });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Erro na API do ULTRON.');
-  }
-
-  return data.reply || data.response || data.text || data.answer || '';
+  let response;
+  try {
+    response = await fetch('/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:buildPrompt(message),history:historyForRequest,memories})});
+  } catch (error) { throw new Error('Não consegui conectar a /api/chat. Confira se a publicação da Vercel terminou.'); }
+  const raw = await response.text(); let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; } catch { throw new Error('A rota /api/chat não retornou JSON. Verifique a função API e a publicação da Vercel.'); }
+  if (!response.ok) throw new Error(data.error || ('Erro HTTP ' + response.status + ' na API.'));
+  const reply = data.reply || data.response || data.text || data.answer;
+  if (typeof reply !== 'string' || !reply.trim()) throw new Error('A API respondeu, mas não enviou texto.');
+  return reply.trim();
 }
+
+async function saveHistory() {
+  if (!currentUser) return;
+  try { await setDoc(conversationRef(), {messages:history.slice(-40),updatedAt:serverTimestamp()}, {merge:true}); }
+  catch (error) { console.warn('Histórico local mantido; falha ao sincronizar:', error); setStatus('Conectado · histórico não sincronizado'); }
+}
+async function saveMemories() {
+  memories = memories.filter(item => typeof item === 'string').slice(0,30);
+  localWrite('ultron_v4_memories_' + (currentUser?.uid || 'local'), memories);
+  renderMemories();
+  if (!currentUser) return;
+  try { await setDoc(memoryRef(), {items:memories,updatedAt:serverTimestamp()}, {merge:true}); $('memoryStatus').textContent = 'Memória sincronizada.'; }
+  catch (error) { $('memoryStatus').textContent = 'Salva neste dispositivo; não foi possível sincronizar com o Firestore.'; console.warn(error); }
+}
+function renderMemories() {
+  const box = $('memoryList'); box.replaceChildren();
+  if (!memories.length) { box.textContent = 'Nenhuma memória salva.'; return; }
+  memories.forEach((item,index) => {
+    const row = document.createElement('div'); row.className = 'memoryitem';
+    const text = document.createElement('span'); text.textContent = item;
+    const button = document.createElement('button'); button.className = 'btn danger'; button.textContent = 'Apagar';
+    button.addEventListener('click', async () => { memories.splice(index,1); await saveMemories(); });
+    row.append(text,button); box.append(row);
+  });
+}
+async function addMemory(value) {
+  const clean = String(value || '').trim().slice(0,500); if (!clean) return;
+  memories.unshift(clean); memories = [...new Set(memories)].slice(0,30); await saveMemories();
+}
+
+function safeFileName(name) { return String(name || 'arquivo.txt').replace(/[\\/:*?"<>|]/g,'_') || 'arquivo.txt'; }
+function downloadText(name, content) {
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'}); const url = URL.createObjectURL(blob); const link = document.createElement('a');
+  link.href = url; link.download = safeFileName(name); document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url),1000);
+}
+function loadProjectsLocal() { projects = localRead(projectStorageKey, []).filter(p => p && typeof p === 'object'); renderProjects(); }
+async function saveProjects() {
+  localWrite(projectStorageKey, projects); renderProjects();
+  if (!currentUser) return;
+  try { await setDoc(projectsRef(), {items:projects.slice(0,50),updatedAt:serverTimestamp()}, {merge:true}); $('projectStatus').textContent = 'Projetos salvos e sincronizados.'; }
+  catch (error) { $('projectStatus').textContent = 'Projetos salvos neste dispositivo; sincronização indisponível.'; console.warn(error); }
+}
+async function loadProjects() {
+  loadProjectsLocal();
+  if (!currentUser) return;
+  try { const snap = await getDoc(projectsRef()); if (snap.exists() && Array.isArray(snap.data().items)) { projects = snap.data().items; localWrite(projectStorageKey,projects); renderProjects(); } }
+  catch (error) { console.warn('Usando projetos locais:',error); }
+}
+function renderProjects() {
+  const box = $('projectList'); if (!box) return; box.replaceChildren();
+  if (!projects.length) { box.textContent = 'Nenhum projeto salvo.'; return; }
+  projects.forEach((project,index) => {
+    const row = document.createElement('div'); row.className = 'memoryitem';
+    const name = document.createElement('span'); name.textContent = project.name || project.filename || 'Projeto sem nome'; row.append(name);
+    if (project.content) { const open = document.createElement('button'); open.className = 'btn'; open.textContent = 'Abrir'; open.addEventListener('click', () => { const file = {id:'project_'+Date.now(),name:safeFileName(project.filename || 'projeto.txt'),content:project.content}; files.push(file); renderFiles(); openEditor(file.id); showPage('injector'); }); row.append(open); }
+    const remove = document.createElement('button'); remove.className = 'btn danger'; remove.textContent = 'Apagar'; remove.addEventListener('click', async () => { projects.splice(index,1); await saveProjects(); }); row.append(remove); box.append(row);
+  });
+}
+function saveGeneratedAsProject() {
+  if (!generatedCode) { $('codeActionStatus').textContent = 'Gere um código antes de salvar.'; return; }
+  projects.unshift({id:'project_'+Date.now(),name:$('codePrompt').value.trim().slice(0,100) || 'Projeto ULTRON',filename:safeFileName($('codeFilename').value || 'codigo.txt'),content:generatedCode,createdAt:new Date().toISOString()});
+  projects = projects.slice(0,50); saveProjects(); $('codeActionStatus').textContent = 'Projeto salvo.';
+}
+function renderFiles() {
+  const box = $('fileList'); box.replaceChildren();
+  if (!files.length) { box.textContent = 'Nenhum arquivo importado.'; return; }
+  files.forEach(file => {
+    const row = document.createElement('div'); row.className = 'memoryitem'; const name = document.createElement('span'); name.textContent = file.name;
+    const edit = document.createElement('button'); edit.className = 'btn'; edit.textContent = 'Editar'; edit.addEventListener('click', () => openEditor(file.id)); row.append(name,edit); box.append(row);
+  });
+}
+function openEditor(id) { const file = files.find(item => item.id === id); if (!file) return; activeFileId = id; $('editorFilename').textContent = file.name; $('editor').value = file.content; $('editorStatus').textContent = ''; $('editorCard').classList.remove('hidden'); }
+function applyFile() { const file = files.find(item => item.id === activeFileId); if (!file) return; file.content = $('editor').value; renderFiles(); $('editorStatus').textContent = 'Alterações aplicadas na sessão atual. Baixe o arquivo para salvar no aparelho.'; }
+async function importFiles(fileList) {
+  for (const file of Array.from(fileList || [])) {
+    if (file.size > fileLimit) { $('injectorStatus').textContent = file.name + ' ultrapassa o limite de 2 MB.'; continue; }
+    try { files.push({id:'file_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:safeFileName(file.name),content:await file.text()}); }
+    catch { $('injectorStatus').textContent = 'Não consegui abrir ' + file.name + '.'; }
+  }
+  renderFiles(); $('injectorStatus').textContent = files.length ? 'Arquivos carregados nesta sessão.' : $('injectorStatus').textContent;
+}
+function clearFiles() { files = []; activeFileId = null; $('editorCard').classList.add('hidden'); renderFiles(); $('injectorStatus').textContent = 'Lista limpa.'; }
 
 async function sendMessage() {
   if (busy || !currentUser) return;
-
-  const input = $('messageInput');
-  const message = input.value.trim();
-
-  if (!message) return;
-
-  input.value = '';
-  addMessage(message, 'user');
-
-  busy = true;
-  $('sendBtn').disabled = true;
-
+  const input = $('messageInput'); const message = input.value.trim(); if (!message) return;
+  input.value = ''; addMessage(message,'user'); busy = true; $('sendBtn').disabled = true; setStatus('ULTRON processando…');
   try {
-    const answer = await callChatAPI(
-      message,
-      history.slice(-12, -1)
-    );
-
-    addMessage(answer, 'bot');
-    await saveHistory();
-  } catch (error) {
-    addMessage(
-      'Não consegui responder: ' + error.message,
-      'bot'
-    );
-  } finally {
-    busy = false;
-    $('sendBtn').disabled = false;
-  }
+    const remember = message.match(/^(?:lembre(?:-se)? que|lembre|guarde na memoria|guarde na memória)\s*[:,-]?\s*(.+)$/i);
+    if (remember) { await addMemory(remember[1]); addMessage('Memória salva: ' + remember[1],'bot'); await saveHistory(); return; }
+    const answer = await callChatAPI(message,history.slice(-12,-1)); addMessage(answer,'bot'); await saveHistory(); setStatus('Online');
+  } catch (error) { addMessage('Não consegui responder: ' + error.message,'bot'); setStatus('Erro na API'); }
+  finally { busy = false; $('sendBtn').disabled = false; }
+}
+function extractCode(reply) { const match = reply.match(/```[^\n`]*\n([\s\S]*?)```/); return match ? match[1].trimEnd() : reply.trim(); }
+async function generateCode() {
+  const prompt = $('codePrompt').value.trim(); if (!prompt || busy) { $('codeStatus').textContent = prompt ? 'Aguarde a solicitação atual terminar.' : 'Descreva o código que deseja gerar.'; return; }
+  busy = true; $('codeGenerate').disabled = true; $('codeStatus').textContent = 'Gerando código…'; $('codeActionStatus').textContent = '';
+  try {
+    const answer = await callChatAPI('Crie código funcional para a seguinte solicitação: '+prompt+'\nLinguagem/formato solicitado: '+$('codeLanguage').value+'. Entregue o código completo em um único bloco Markdown com cerca de três crases e a linguagem. Se houver alguma limitação, explique brevemente após o bloco.',history.slice(-8));
+    generatedCode = extractCode(answer); $('codeOutput').textContent = generatedCode; $('codeFileLabel').textContent = safeFileName($('codeFilename').value || 'codigo.txt'); $('codeResultTitle').textContent = 'Código gerado'; $('codeResultCard').classList.remove('hidden'); $('codeStatus').textContent = 'Código gerado. Revise antes de executar.'; setStatus('Online');
+  } catch (error) { $('codeStatus').textContent = 'Erro: ' + error.message; setStatus('Erro na API'); }
+  finally { busy = false; $('codeGenerate').disabled = false; }
 }
 
 async function login() {
+  if (!auth) { showLoginError('Firebase ainda está iniciando. Recarregue a página e tente novamente.'); return; }
+  const button = $('loginBtn'); button.disabled = true; showLoginError('Abrindo o login do Google…');
+  const provider = new GoogleAuthProvider(); provider.setCustomParameters({prompt:'select_account'});
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.matchMedia('(max-width: 800px)').matches;
   try {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
-
-    await signInWithPopup(auth, provider);
+    if (isMobile) { await signInWithRedirect(auth,provider); return; }
+    await signInWithPopup(auth,provider); showLoginError('');
   } catch (error) {
-    $('loginStatus').textContent =
-      'Erro ao entrar: ' + error.message;
-  }
-}
-
-function loadProjectsLocal() {
-  try {
-    projects = JSON.parse(
-      localStorage.getItem('ultron_v3_projects') || '[]'
-    );
-  } catch {
-    projects = [];
-  }
-
-  renderProjects();
-}
-
-function saveLocalProjects() {
-  localStorage.setItem(
-    'ultron_v3_projects',
-    JSON.stringify(projects)
-  );
-}
-
-function renderProjects() {
-  const box = $('projectList');
-  box.innerHTML = '';
-
-  if (!projects.length) {
-    box.textContent = 'Nenhum projeto salvo.';
-    return;
-  }
-
-  projects.forEach((project, index) => {
-    const row = document.createElement('div');
-    row.className = 'memoryitem';
-
-    const name = document.createElement('span');
-    name.textContent = project.name;
-
-    const remove = document.createElement('button');
-    remove.className = 'btn danger';
-    remove.textContent = 'Apagar';
-
-    remove.onclick = () => {
-      projects.splice(index, 1);
-      saveLocalProjects();
-      renderProjects();
-    };
-
-    row.append(name, remove);
-    box.appendChild(row);
-  });
-}
-
-function saveGeneratedAsProject() {
-  if (!generatedCode) {
-    $('codeActionStatus').textContent =
-      'Gere um código antes de salvar.';
-    return;
-  }
-
-  projects.unshift({
-    name: $('codePrompt').value.trim() || 'Projeto ULTRON',
-    filename: $('codeFilename').value.trim() || 'codigo.txt',
-    content: generatedCode,
-    createdAt: new Date().toISOString()
-  });
-
-  saveLocalProjects();
-  renderProjects();
-
-  $('codeActionStatus').textContent =
-    'Projeto salvo neste dispositivo.';
-}
-
-function safeFileName(name) {
-  return name.replace(/[\\/:*?"<>|]/g, '_') || 'arquivo.txt';
-}
-
-function downloadText(name, content) {
-  const blob = new Blob([content], {
-    type: 'text/plain;charset=utf-8'
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-
-  link.href = url;
-  link.download = safeFileName(name);
-
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  URL.revokeObjectURL(url);
-}
-
-function renderFiles() {
-  const box = $('fileList');
-  box.innerHTML = '';
-
-  files.forEach(file => {
-    const row = document.createElement('div');
-    row.className = 'memoryitem';
-
-    const name = document.createElement('span');
-    name.textContent = file.name;
-
-    const edit = document.createElement('button');
-    edit.className = 'btn';
-    edit.textContent = 'Editar';
-
-    edit.onclick = () => openEditor(file.id);
-
-    row.append(name, edit);
-    box.appendChild(row);
-  });
-}
-
-function openEditor(id) {
-  const file = files.find(item => item.id === id);
-  if (!file) return;
-
-  activeFileId = id;
-  $('editorFilename').textContent = file.name;
-  $('editor').value = file.content;
-  $('editorCard').classList.remove('hidden');
-}
-
-function applyFile() {
-  const file = files.find(item => item.id === activeFileId);
-  if (!file) return;
-
-  file.content = $('editor').value;
-  renderFiles();
-
-  $('editorStatus').textContent =
-    'Alterações aplicadas na sessão atual.';
-}
-
-async function importFiles(fileList) {
-  for (const file of fileList) {
-    if (file.size > 2 * 1024 * 1024) {
-      $('injectorStatus').textContent =
-        file.name + ' ultrapassa o limite de 2 MB.';
-      continue;
+    console.error('Falha no login:',error);
+    if (['auth/popup-blocked','auth/popup-closed-by-user','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'].includes(error.code)) {
+      try { await signInWithRedirect(auth,provider); return; } catch (redirectError) { error = redirectError; }
     }
-
-    const content = await file.text();
-
-    files.push({
-      id: 'file_' + Date.now() + '_' + Math.random(),
-      name: safeFileName(file.name),
-      content
-    });
+    showLoginError(loginErrorMessage(error)); button.disabled = false;
   }
-
-  renderFiles();
 }
-
-function clearFiles() {
-  files = [];
-  activeFileId = null;
-
-  $('editorCard').classList.add('hidden');
-  renderFiles();
+function loginErrorMessage(error) {
+  const messages = {
+    'auth/unauthorized-domain':'Este domínio não está autorizado no Firebase Authentication. Adicione o domínio atual em Authentication → Settings → Authorized domains.',
+    'auth/operation-not-allowed':'O login com Google não está ativado no Firebase Authentication.',
+    'auth/network-request-failed':'Falha de rede. Verifique a conexão e tente novamente.',
+    'auth/invalid-api-key':'A chave pública do Firebase está inválida. Confira firebaseConfig.'
+  };
+  return (messages[error?.code] || error?.message || 'Erro desconhecido no login.') + (error?.code ? ' ('+error.code+')' : '');
 }
-
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(page => {
-    page.classList.add('hidden');
-  });
-
-  const page = $('page-' + name);
-  if (page) page.classList.remove('hidden');
-
-  document.querySelectorAll('#nav button').forEach(button => {
-    button.classList.toggle(
-      'active',
-      button.dataset.page === name
-    );
-  });
+async function handleAuthUser(user) {
+  currentUser = user;
+  if (!user) { $('loginScreen').classList.remove('hidden'); $('app').classList.add('hidden'); $('loginBtn').disabled = false; setStatus('Desconectado'); return; }
+  $('loginScreen').classList.add('hidden'); $('app').classList.remove('hidden'); $('loginBtn').disabled = false; showLoginError('');
+  $('userEmail').textContent = user.email || 'Conta Google'; $('settingsEmail').textContent = user.email || 'Conta Google'; $('integrationStatus').textContent = 'Firebase Authentication conectado.'; setStatus('Online');
+  const uidKey = 'ultron_v4_memories_' + user.uid;
+  memories = localRead(uidKey, []); history = [];
+  try {
+    const [convSnap,memSnap] = await Promise.all([getDoc(conversationRef()),getDoc(memoryRef())]);
+    if (convSnap.exists() && Array.isArray(convSnap.data().messages)) history = convSnap.data().messages.filter(item => item && ['user','model'].includes(item.role) && (Array.isArray(item.parts) || typeof item.text === 'string')).slice(-40);
+    if (memSnap.exists() && Array.isArray(memSnap.data().items)) memories = memSnap.data().items.filter(item => typeof item === 'string').slice(0,30);
+    localWrite(uidKey,memories); $('integrationStatus').textContent = 'Firebase Authentication e Firestore acessíveis.';
+  } catch (error) { console.warn('Firestore indisponível; seguindo com dados locais:',error); $('integrationStatus').textContent = 'Login conectado; Firestore indisponível. Algumas funções ficam locais.'; }
+  renderHistory(); renderMemories(); await loadProjects();
 }
 
 function wireEvents() {
-  $('loginBtn').addEventListener('click', login);
-
-  $('logoutBtn').addEventListener('click', () => signOut(auth));
-  $('settingsLogout').addEventListener('click', () => signOut(auth));
-
-  document.querySelectorAll('#nav button').forEach(button => {
-    button.addEventListener('click', () => {
-      showPage(button.dataset.page);
-    });
-  });
-
-  document.querySelectorAll('[data-goto]').forEach(button => {
-    button.addEventListener('click', () => {
-      showPage(button.dataset.goto);
-    });
-  });
-
-  $('sendBtn').addEventListener('click', sendMessage);
-
-  $('messageInput').addEventListener('keydown', event => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
-    }
-  });
-
-  $('saveMemory').addEventListener('click', async () => {
-    const value = $('memoryInput').value.trim();
-    if (!value) return;
-
-    memories.unshift(value);
-    memories = memories.slice(0, 30);
-
-    $('memoryInput').value = '';
-    await saveMemories();
-  });
-
-  $('addProject').addEventListener('click', () => {
-    const name = $('projectName').value.trim();
-    if (!name) return;
-
-    projects.unshift({ name });
-    $('projectName').value = '';
-
-    saveLocalProjects();
-    renderProjects();
-  });
-
-  $('saveCodeProject').addEventListener(
-    'click',
-    saveGeneratedAsProject
-  );
-
-  $('downloadCode').addEventListener('click', () => {
-    downloadText(
-      $('codeFilename').value || 'codigo.txt',
-      generatedCode
-    );
-  });
-
-  $('filePicker').addEventListener('change', event => {
-    importFiles(event.target.files);
-    event.target.value = '';
-  });
-
-  $('applyFile').addEventListener('click', applyFile);
-  $('clearFiles').addEventListener('click', clearFiles);
-
-  $('downloadFile').addEventListener('click', () => {
-    const file = files.find(item => item.id === activeFileId);
-    if (file) downloadText(file.name, $('editor').value);
-  });
-
-  $('closeEditor').addEventListener('click', () => {
-    $('editorCard').classList.add('hidden');
-  });
+  $('loginBtn').addEventListener('click',login);
+  $('logoutBtn').addEventListener('click',() => signOut(auth).catch(error => showLoginError(loginErrorMessage(error))));
+  $('settingsLogout').addEventListener('click',() => signOut(auth).catch(error => { $('preferencesStatus').textContent = loginErrorMessage(error); }));
+  document.querySelectorAll('#nav button').forEach(button => button.addEventListener('click',() => showPage(button.dataset.page)));
+  document.querySelectorAll('[data-goto]').forEach(button => button.addEventListener('click',() => showPage(button.dataset.goto)));
+  $('menuBtn').addEventListener('click',() => $('sidebar').classList.toggle('open'));
+  $('sendBtn').addEventListener('click',sendMessage);
+  $('messageInput').addEventListener('keydown',event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } });
+  $('saveMemory').addEventListener('click',async () => { const input = $('memoryInput'); const value = input.value.trim(); if (!value) return; await addMemory(value); input.value = ''; $('memoryStatus').textContent = 'Memória adicionada.'; });
+  $('addProject').addEventListener('click',async () => { const input = $('projectName'); const name = input.value.trim(); if (!name) return; projects.unshift({id:'project_'+Date.now(),name,createdAt:new Date().toISOString()}); input.value = ''; await saveProjects(); });
+  $('codeGenerate').addEventListener('click',generateCode);
+  $('codeClear').addEventListener('click',() => { $('codePrompt').value = ''; generatedCode = ''; $('codeOutput').textContent = ''; $('codeResultCard').classList.add('hidden'); $('codeStatus').textContent = ''; });
+  $('copyCode').addEventListener('click',async () => { if (!generatedCode) return; try { await navigator.clipboard.writeText(generatedCode); $('codeActionStatus').textContent = 'Código copiado.'; } catch { $('codeActionStatus').textContent = 'Não consegui copiar automaticamente. Selecione o código e copie manualmente.'; } });
+  $('downloadCode').addEventListener('click',() => { if (generatedCode) downloadText($('codeFilename').value || 'codigo.txt',generatedCode); });
+  $('saveCodeProject').addEventListener('click',saveGeneratedAsProject);
+  $('sendCodeToInjector').addEventListener('click',() => { if (!generatedCode) { $('codeActionStatus').textContent = 'Gere um código primeiro.'; return; } const file = {id:'generated_'+Date.now(),name:safeFileName($('codeFilename').value || 'codigo.txt'),content:generatedCode}; files.push(file); renderFiles(); openEditor(file.id); showPage('injector'); });
+  $('filePicker').addEventListener('change',async event => { await importFiles(event.target.files); event.target.value = ''; });
+  $('applyFile').addEventListener('click',applyFile); $('clearFiles').addEventListener('click',clearFiles);
+  $('downloadFile').addEventListener('click',() => { const file = files.find(item => item.id === activeFileId); if (file) downloadText(file.name,$('editor').value); });
+  $('closeEditor').addEventListener('click',() => $('editorCard').classList.add('hidden'));
+  $('downloadAll').addEventListener('click',() => { if (!files.length) { $('injectorStatus').textContent = 'Não há arquivos para baixar.'; return; } files.forEach((file,index) => setTimeout(() => downloadText(file.name,file.content),index*300)); $('injectorStatus').textContent = 'Downloads iniciados. O navegador pode pedir permissão para vários arquivos.'; });
+  $('savePreferences').addEventListener('click',savePreferences);
 }
 
 async function start() {
+  getPreferences(); loadProjectsLocal(); renderMemories(); renderFiles(); wireEvents();
   try {
-    const app = initializeApp(firebaseConfig);
-
-    auth = getAuth(app);
-    db = getFirestore(app);
-
-    wireEvents();
-    loadProjectsLocal();
-
-    onAuthStateChanged(auth, async user => {
-      currentUser = user;
-
-      if (user) {
-        $('loginScreen').classList.add('hidden');
-        $('app').classList.remove('hidden');
-
-        $('userEmail').textContent = user.email || '';
-        $('settingsEmail').textContent = user.email || '';
-
-        try {
-          const conversation = await getDoc(conversationRef());
-
-          if (conversation.exists()) {
-            history = conversation.data().messages || [];
-          }
-
-          const memory = await getDoc(memoryRef());
-
-          if (memory.exists()) {
-            memories = memory.data().items || [];
-          }
-
-          renderMemories();
-          await loadProjects();
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        $('loginScreen').classList.remove('hidden');
-        $('app').classList.add('hidden');
-      }
-    });
+    const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app);
+    await setPersistence(auth,browserLocalPersistence).catch(error => console.warn('Persistência de login:',error));
+    try { await getRedirectResult(auth); } catch (error) { console.error('Resultado do login por redirecionamento:',error); if (error?.code) showLoginError(loginErrorMessage(error)); }
+    onAuthStateChanged(auth,handleAuthUser,error => { console.error('Estado de autenticação:',error); showLoginError(loginErrorMessage(error)); setStatus('Erro no login'); $('loginBtn').disabled = false; });
   } catch (error) {
-    console.error(error);
-    $('loginStatus').textContent =
-      'Falha ao iniciar o Firebase: ' + error.message;
+    console.error('Falha ao iniciar Firebase:',error); showLoginError('Falha ao iniciar Firebase: ' + loginErrorMessage(error)); $('integrationStatus').textContent = 'Falha ao iniciar Firebase.'; setStatus('Erro');
   }
 }
-
 start();
+</script>
+</body>
+</html>
